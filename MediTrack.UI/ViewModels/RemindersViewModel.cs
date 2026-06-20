@@ -84,6 +84,10 @@ public partial class RemindersViewModel : ObservableObject
             var vm = App.Services.GetRequiredService<SettingsViewModel>();
             _navigationService.NavigateTo(vm);
         }
+        else return;
+
+        _selectedNavItem = NavItems[3];
+        OnPropertyChanged(nameof(SelectedNavItem));
     }
 
     public RemindersViewModel(

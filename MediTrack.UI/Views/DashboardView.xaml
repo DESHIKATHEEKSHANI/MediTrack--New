@@ -173,31 +173,135 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" Text="Today's Medicines" FontSize="16" FontWeight="SemiBold" Foreground="#1A1A1A" />
-                                    <Button Grid.Column="1" Content="View Schedule" Command="{Binding RefreshCommand}" Background="#E3F2FD" Foreground="#104C7F" Padding="8,4" FontSize="12" BorderThickness="0" />
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Today's Medicines" FontSize="16" FontWeight="SemiBold" Foreground="#1A1A1A" />
+                                        <TextBlock Text="{Binding TodayLogs.Count, StringFormat='{}{0} doses scheduled today'}" FontSize="11" Foreground="#888888" Margin="0,2,0,0" />
+                                    </StackPanel>
+                                    <Button Grid.Column="1" Content="Refresh" Command="{Binding RefreshCommand}" Background="#E3F2FD" Foreground="#104C7F" Padding="8,4" FontSize="12" BorderThickness="0" />
                                 </Grid>
-                                <ItemsControl ItemsSource="{Binding TodayLogs}">
+                                <ItemsControl ItemsSource="{Binding TodayLogsTruncated}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Background="#F8F9FA" CornerRadius="8" Padding="12" Margin="0,0,0,8">
+                                            <Border CornerRadius="8" Padding="12" Margin="0,0,0,8" BorderThickness="3,0,0,0">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Background" Value="#FFF8E1" />
+                                                        <Setter Property="BorderBrush" Value="#FF9800" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Status}" Value="Taken">
+                                                                <Setter Property="Background" Value="#E8F5E9" />
+                                                                <Setter Property="BorderBrush" Value="#4CAF50" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Status}" Value="Dismissed">
+                                                                <Setter Property="Background" Value="#FAFAFA" />
+                                                                <Setter Property="BorderBrush" Value="#BDBDBD" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*" />
                                                         <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="Auto" />
                                                     </Grid.ColumnDefinitions>
                                                     <StackPanel Grid.Column="0">
-                                                        <TextBlock Text="{Binding Medication.DisplayName}" FontWeight="SemiBold" Foreground="#1A1A1A" />
-                                                        <TextBlock Text="{Binding ScheduledDateTime, StringFormat='Scheduled: {0:hh:mm tt}'}" FontSize="12" Foreground="#888888" />
-                                                        <TextBlock Text="{Binding Status}" FontSize="12" FontWeight="Bold" Foreground="#666666" />
+                                                        <TextBlock Text="{Binding Medication.OfficialName}" FontWeight="SemiBold" FontSize="13" Foreground="#1A1A1A" />
+                                                        <TextBlock Text="{Binding Medication.DisplayName}" FontSize="11" Foreground="#888888" Visibility="{Binding Medication.DisplayName, Converter={StaticResource StringToVisibilityConverter}}" />
+                                                        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                                            <Border CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                                                <Border.Style>
+                                                                    <Style TargetType="Border">
+                                                                        <Setter Property="Background" Value="#FFF3E0" />
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding Status}" Value="Taken">
+                                                                                <Setter Property="Background" Value="#E8F5E9" />
+                                                                            </DataTrigger>
+                                                                            <DataTrigger Binding="{Binding Status}" Value="Dismissed">
+                                                                                <Setter Property="Background" Value="#F5F5F5" />
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Border.Style>
+                                                                <TextBlock FontSize="11" FontWeight="SemiBold">
+                                                                    <TextBlock.Style>
+                                                                        <Style TargetType="TextBlock">
+                                                                            <Setter Property="Text" Value="⏳ Pending" />
+                                                                            <Setter Property="Foreground" Value="#E65100" />
+                                                                            <Style.Triggers>
+                                                                                <DataTrigger Binding="{Binding Status}" Value="Taken">
+                                                                                    <Setter Property="Text" Value="✓ Taken" />
+                                                                                    <Setter Property="Foreground" Value="#2E7D32" />
+                                                                                </DataTrigger>
+                                                                                <DataTrigger Binding="{Binding Status}" Value="Dismissed">
+                                                                                    <Setter Property="Text" Value="✗ Skipped" />
+                                                                                    <Setter Property="Foreground" Value="#757575" />
+                                                                                </DataTrigger>
+                                                                            </Style.Triggers>
+                                                                        </Style>
+                                                                    </TextBlock.Style>
+                                                                </TextBlock>
+                                                            </Border>
+                                                            <TextBlock Text="{Binding ScheduledDateTime, StringFormat='{}{0:hh:mm tt}'}" FontSize="11" Foreground="#888888" VerticalAlignment="Center" />
+                                                        </StackPanel>
                                                     </StackPanel>
-                                                    <Button Grid.Column="1" Content="Taken" Command="{Binding DataContext.MarkTakenCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#4CAF50" Foreground="White" Padding="8,4" Margin="0,0,6,0" BorderThickness="0" FontSize="12" />
-                                                    <Button Grid.Column="2" Content="Skip" Command="{Binding DataContext.MarkDismissedCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#FF9800" Foreground="White" Padding="8,4" BorderThickness="0" FontSize="12" />
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <Button Content="Taken"
+                                                                Command="{Binding DataContext.MarkTakenCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                CommandParameter="{Binding}"
+                                                                Background="#4CAF50" Foreground="White" Padding="10,5" Margin="0,0,6,0" BorderThickness="0" FontSize="12">
+                                                            <Button.Style>
+                                                                <Style TargetType="Button">
+                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Status}" Value="Pending">
+                                                                            <Setter Property="Visibility" Value="Visible" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </Button.Style>
+                                                            <Button.Template>
+                                                                <ControlTemplate TargetType="Button">
+                                                                    <Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                                    </Border>
+                                                                </ControlTemplate>
+                                                            </Button.Template>
+                                                        </Button>
+                                                        <Button Content="Skip"
+                                                                Command="{Binding DataContext.MarkDismissedCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                CommandParameter="{Binding}"
+                                                                Background="#FF9800" Foreground="White" Padding="10,5" BorderThickness="0" FontSize="12">
+                                                            <Button.Style>
+                                                                <Style TargetType="Button">
+                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Status}" Value="Pending">
+                                                                            <Setter Property="Visibility" Value="Visible" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </Button.Style>
+                                                            <Button.Template>
+                                                                <ControlTemplate TargetType="Button">
+                                                                    <Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                                    </Border>
+                                                                </ControlTemplate>
+                                                            </Button.Template>
+                                                        </Button>
+                                                    </StackPanel>
                                                 </Grid>
                                             </Border>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
+                                <Button Command="{Binding NavigateToMyMedicinesCommand}"
+                                        Visibility="{Binding HasMoreLogs, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                        Background="Transparent" BorderThickness="0" HorizontalAlignment="Right" Padding="0,6,0,0" Cursor="Hand">
+                                    <TextBlock FontSize="12" Foreground="#104C7F" TextDecorations="Underline">
+                                        <Run Text="+" /><Run Text="{Binding ExtraLogsCount}" /><Run Text=" more → View All in My Medicines" />
+                                    </TextBlock>
+                                </Button>
                             </StackPanel>
                         </Border>
 
@@ -235,10 +339,10 @@
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate DataType="{x:Type models:WeeklyBarItem}">
                                                     <Grid Height="160">
-                                                        <TextBlock Text="{Binding Value, StringFormat={}{0:F0}%}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="11" Foreground="#104C7F" Margin="0,2,0,0" />
+                                                        <TextBlock Text="{Binding Value, StringFormat={}{0:F0}%}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="11" Foreground="#555555" FontWeight="SemiBold" Margin="0,2,0,0" />
                                                         <Grid VerticalAlignment="Bottom" Height="120" Margin="4,0">
                                                             <Border Background="#E3F2FD" CornerRadius="4" />
-                                                            <Border Background="#104C7F" Height="{Binding BarHeightSmall}" VerticalAlignment="Bottom" CornerRadius="4" />
+                                                            <Border Background="{Binding BarColor}" Height="{Binding BarHeightSmall}" VerticalAlignment="Bottom" CornerRadius="4" />
                                                         </Grid>
                                                         <TextBlock Text="{Binding Label}" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="11" Foreground="#888888" Margin="0,0,0,2" />
                                                     </Grid>
@@ -254,15 +358,59 @@
                                 <Border.Effect><DropShadowEffect ShadowDepth="0" BlurRadius="12" Opacity="0.06" Color="#000000" /></Border.Effect>
                                 <StackPanel>
                                     <TextBlock Text="Recent Activity" FontSize="14" FontWeight="SemiBold" Foreground="#1A1A1A" Margin="0,0,0,8" />
-                                    <ItemsControl ItemsSource="{Binding TodayLogs}" MaxHeight="200">
+                                    <TextBlock Text="No activity yet today" FontSize="12" Foreground="#AAAAAA" FontStyle="Italic">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding RecentActivityLogs.Count}" Value="0">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <ItemsControl ItemsSource="{Binding RecentActivityLogs}" MaxHeight="200">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                                                    <Ellipse Width="8" Height="8" Fill="#4CAF50" Margin="0,0,8,0" VerticalAlignment="Center" />
-                                                    <TextBlock Text="{Binding Medication.DisplayName}" FontSize="12" Foreground="#1A1A1A" />
-                                                    <TextBlock Text=" - " FontSize="12" Foreground="#888888" />
-                                                    <TextBlock Text="{Binding Status}" FontSize="12" Foreground="#888888" />
-                                                </StackPanel>
+                                                <Grid Margin="0,0,0,8">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Ellipse Grid.Column="0" Width="8" Height="8" Margin="0,0,10,0" VerticalAlignment="Center">
+                                                        <Ellipse.Style>
+                                                            <Style TargetType="Ellipse">
+                                                                <Setter Property="Fill" Value="#FF9800" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Status}" Value="Taken">
+                                                                        <Setter Property="Fill" Value="#4CAF50" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding Status}" Value="Dismissed">
+                                                                        <Setter Property="Fill" Value="#D32F2F" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Ellipse.Style>
+                                                    </Ellipse>
+                                                    <StackPanel Grid.Column="1">
+                                                        <TextBlock Text="{Binding Medication.OfficialName}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A1A" />
+                                                        <TextBlock FontSize="11" Foreground="#888888">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Setter Property="Text" Value="Skipped" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Status}" Value="Taken">
+                                                                            <Setter Property="Text" Value="Taken" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Column="2" Text="{Binding ActionTimestamp, StringFormat='{}{0:hh:mm tt}'}" FontSize="11" Foreground="#AAAAAA" VerticalAlignment="Center" />
+                                                </Grid>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
@@ -279,39 +427,105 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="My Medications" FontSize="16" FontWeight="SemiBold" Foreground="#1A1A1A" />
-                                <Button Grid.Column="1" Content="+ Add" Command="{Binding ShowAddMedicationCommand}" Background="#104C7F" Foreground="White" Padding="10,6" FontSize="12" BorderThickness="0" />
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="My Medications" FontSize="16" FontWeight="SemiBold" Foreground="#1A1A1A" />
+                                    <TextBlock Text="{Binding TotalMedicines, StringFormat='{}{0} active prescriptions'}" FontSize="11" Foreground="#888888" Margin="0,2,0,0" />
+                                </StackPanel>
+                                <Button Grid.Column="1" Content="View All →" Command="{Binding NavigateToMyMedicinesCommand}" Background="Transparent" Foreground="#104C7F" Padding="8,6" FontSize="12" BorderThickness="0" Margin="0,0,8,0" />
+                                <Button Grid.Column="2" Content="+ Add" Command="{Binding ShowAddMedicationCommand}" Background="#104C7F" Foreground="White" Padding="10,6" FontSize="12" BorderThickness="0">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
                             </Grid>
-                            <ItemsControl ItemsSource="{Binding TodayMedicines}">
+                            <ItemsControl ItemsSource="{Binding AllMedicines}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border BorderBrush="#F0F0F0" BorderThickness="0,0,0,1" Padding="10,8">
+                                        <Border BorderBrush="#F0F0F0" BorderThickness="0,0,0,1" Padding="10,10">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
                                                     <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
                                                 <StackPanel Grid.Column="0">
-                                                    <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" Foreground="#1A1A1A" />
-                                                    <TextBlock FontSize="12" Foreground="#888888">
-                                                        <TextBlock.Text>
-                                                            <MultiBinding StringFormat="{}{0} {1} at {2}">
-                                                                <Binding Path="DosageValue" />
-                                                                <Binding Path="DosageUnit" />
-                                                                <Binding Path="ScheduledTime" />
-                                                            </MultiBinding>
-                                                        </TextBlock.Text>
-                                                    </TextBlock>
+                                                    <TextBlock Text="{Binding OfficialName}" FontWeight="SemiBold" Foreground="#1A1A1A" FontSize="13" />
+                                                    <TextBlock Text="{Binding DisplayName}" FontSize="11" Foreground="#888888" Visibility="{Binding DisplayName, Converter={StaticResource StringToVisibilityConverter}}" />
+                                                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                                        <Border Background="#E3F2FD" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                                            <TextBlock Text="{Binding MedicineType}" FontSize="10" Foreground="#104C7F" />
+                                                        </Border>
+                                                        <TextBlock FontSize="11" Foreground="#888888" VerticalAlignment="Center">
+                                                            <TextBlock.Text>
+                                                                <MultiBinding StringFormat="{}{0} {1} · {2}">
+                                                                    <Binding Path="DosageValue" />
+                                                                    <Binding Path="DosageUnit" />
+                                                                    <Binding Path="Frequency" />
+                                                                </MultiBinding>
+                                                            </TextBlock.Text>
+                                                        </TextBlock>
+                                                    </StackPanel>
                                                 </StackPanel>
-                                                <Button Grid.Column="1" Content="Edit" Command="{Binding DataContext.ShowEditMedicationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#E3F2FD" Foreground="#104C7F" Padding="8,4" Margin="0,0,6,0" BorderThickness="0" FontSize="12" />
-                                                <Button Grid.Column="2" Content="Delete" Command="{Binding DataContext.DeleteMedicationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#FFEBEE" Foreground="#D32F2F" Padding="8,4" BorderThickness="0" FontSize="12" />
+                                                <Border Grid.Column="1" CornerRadius="4" Padding="6,2" Margin="0,0,12,0" VerticalAlignment="Center">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Background" Value="#E8F5E9" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsArchived}" Value="True">
+                                                                    <Setter Property="Background" Value="#FFF3E0" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <TextBlock FontSize="10" FontWeight="SemiBold">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Text" Value="Active" />
+                                                                <Setter Property="Foreground" Value="#2E7D32" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsArchived}" Value="True">
+                                                                        <Setter Property="Text" Value="Archived" />
+                                                                        <Setter Property="Foreground" Value="#E65100" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Border>
+                                                <Button Grid.Column="2" Content="Edit" Command="{Binding DataContext.ShowEditMedicationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#E3F2FD" Foreground="#104C7F" Padding="8,4" Margin="0,0,6,0" BorderThickness="0" FontSize="12">
+                                                    <Button.Template>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Button.Template>
+                                                </Button>
+                                                <Button Grid.Column="3" Content="Delete" Command="{Binding DataContext.DeleteMedicationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#FFEBEE" Foreground="#D32F2F" Padding="8,4" BorderThickness="0" FontSize="12">
+                                                    <Button.Template>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Button.Template>
+                                                </Button>
                                             </Grid>
                                         </Border>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
+                            <Button Command="{Binding NavigateToMyMedicinesCommand}"
+                                    Background="Transparent" BorderThickness="0" HorizontalAlignment="Center" Padding="0,10,0,0" Cursor="Hand">
+                                <TextBlock Text="View All Medications →" FontSize="13" Foreground="#104C7F" TextDecorations="Underline" />
+                            </Button>
                         </StackPanel>
                     </Border>
                 </Grid>
@@ -472,7 +686,7 @@
                                         <TextBlock Text="{Binding Value, StringFormat={}{0:F0}%}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="14" Foreground="#104C7F" Margin="0,4,0,0" />
                                         <Grid VerticalAlignment="Bottom" Height="300" Margin="12,0">
                                             <Border Background="#E3F2FD" CornerRadius="6" />
-                                            <Border Background="#104C7F" Height="{Binding BarHeightLarge}" VerticalAlignment="Bottom" CornerRadius="6" />
+                                            <Border Background="{Binding BarColor}" Height="{Binding BarHeightLarge}" VerticalAlignment="Bottom" CornerRadius="6" />
                                         </Grid>
                                         <TextBlock Text="{Binding Label}" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="14" Foreground="#888888" Margin="0,0,0,4" />
                                     </Grid>

@@ -82,6 +82,10 @@ public partial class SettingsViewModel : ObservableObject
             _navigationService.NavigateTo(App.Services.GetRequiredService<RemindersViewModel>());
         else if (label == "History")
             _navigationService.NavigateTo(App.Services.GetRequiredService<HistoryViewModel>());
+        else return;
+
+        _selectedNavItem = NavItems[5];
+        OnPropertyChanged(nameof(SelectedNavItem));
     }
 
     [RelayCommand]

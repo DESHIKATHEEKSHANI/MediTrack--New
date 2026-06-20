@@ -82,6 +82,10 @@ public partial class ScheduleViewModel : ObservableObject
             var vm = App.Services.GetRequiredService<SettingsViewModel>();
             _navigationService.NavigateTo(vm);
         }
+        else return;
+
+        _selectedNavItem = NavItems[2];
+        OnPropertyChanged(nameof(SelectedNavItem));
     }
 
     partial void OnSelectedDateChanged(DateTime value)

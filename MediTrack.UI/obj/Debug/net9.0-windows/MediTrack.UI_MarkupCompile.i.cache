@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET9_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NET9_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
 D:\Assignments\MediTrack\MediTrack.UI\App.xaml
-5491031019
+10209313483
 
-201540834988
+341871798712
 22943700439
-Views\AlertWindow.xaml;Views\DashboardView.xaml;Views\LoginView.xaml;Views\MainWindow.xaml;Views\SplashView.xaml;
+Views\AlertWindow.xaml;Views\DashboardView.xaml;Views\HistoryView.xaml;Views\LoginView.xaml;Views\MainWindow.xaml;Views\MyMedicinesView.xaml;Views\RemindersView.xaml;Views\ScheduleView.xaml;Views\SettingsView.xaml;Views\SplashView.xaml;
 
 False
 

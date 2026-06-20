@@ -15,6 +15,16 @@ public class IntakeLogService : IIntakeLogService
 
     public async Task<IntakeLog> LogActionAsync(int userId, int medicationId, DateTime scheduledDateTime, IntakeStatus status)
     {
+        var existing = await _context.IntakeLogs
+            .FirstOrDefaultAsync(l => l.UserId == userId && l.MedicationId == medicationId && l.ScheduledDateTime == scheduledDateTime);
+        if (existing != null)
+        {
+            existing.Status = status;
+            existing.ActionTimestamp = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            return existing;
+        }
+
         var log = new IntakeLog
         {
             UserId = userId,
@@ -23,7 +33,6 @@ public class IntakeLogService : IIntakeLogService
             ActionTimestamp = DateTime.UtcNow,
             Status = status
         };
-
         _context.IntakeLogs.Add(log);
         await _context.SaveChangesAsync();
         return log;
@@ -31,7 +40,7 @@ public class IntakeLogService : IIntakeLogService
 
     public async Task<IEnumerable<IntakeLog>> GetUserLogsAsync(int userId, DateTime? from = null, DateTime? to = null)
     {
-        var query = _context.IntakeLogs.AsNoTracking().Where(l => l.UserId == userId);
+        var query = _context.IntakeLogs.AsNoTracking().Include(l => l.Medication).Where(l => l.UserId == userId);
         if (from.HasValue)
             query = query.Where(l => l.ScheduledDateTime >= from.Value);
         if (to.HasValue)
@@ -46,7 +55,9 @@ public class IntakeLogService : IIntakeLogService
         var tomorrow = today.AddDays(1);
         return await _context.IntakeLogs
             .AsNoTracking()
+            .Include(l => l.Medication)
             .Where(l => l.UserId == userId && l.ScheduledDateTime >= today && l.ScheduledDateTime < tomorrow)
+            .OrderBy(l => l.ScheduledDateTime)
             .ToListAsync();
     }
 

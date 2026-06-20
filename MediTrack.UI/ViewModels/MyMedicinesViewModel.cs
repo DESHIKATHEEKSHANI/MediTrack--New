@@ -82,6 +82,10 @@ public partial class MyMedicinesViewModel : ObservableObject
             var vm = App.Services.GetRequiredService<SettingsViewModel>();
             _navigationService.NavigateTo(vm);
         }
+        else return;
+
+        _selectedNavItem = NavItems[1];
+        OnPropertyChanged(nameof(SelectedNavItem));
     }
 
     public ObservableCollection<string> MedicineTypes { get; } = new()

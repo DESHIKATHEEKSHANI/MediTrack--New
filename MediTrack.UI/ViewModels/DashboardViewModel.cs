@@ -83,6 +83,21 @@ public partial class DashboardViewModel : ObservableObject
     private ObservableCollection<WeeklyBarItem> _weeklyAdherenceBars = new();
 
     [ObservableProperty]
+    private ObservableCollection<Medication> _allMedicines = new();
+
+    [ObservableProperty]
+    private ObservableCollection<IntakeLog> _todayLogsTruncated = new();
+
+    [ObservableProperty]
+    private ObservableCollection<IntakeLog> _recentActivityLogs = new();
+
+    [ObservableProperty]
+    private bool _hasMoreLogs;
+
+    [ObservableProperty]
+    private int _extraLogsCount;
+
+    [ObservableProperty]
     private ObservableCollection<NavItem> _navItems = new()
     {
         new NavItem { Label = "Dashboard", Icon = "M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z", IsSelected = true },
@@ -124,6 +139,10 @@ public partial class DashboardViewModel : ObservableObject
             var vm = App.Services.GetRequiredService<SettingsViewModel>();
             _navigationService.NavigateTo(vm);
         }
+        else return;
+
+        _selectedNavItem = NavItems[0];
+        OnPropertyChanged(nameof(SelectedNavItem));
     }
 
     public DashboardViewModel(
@@ -166,13 +185,28 @@ public partial class DashboardViewModel : ObservableObject
 
         var weekLogs = await _intakeLogService.GetUserLogsAsync(_authService.CurrentUser.Id, DateTime.Now.AddDays(-7), DateTime.Now);
 
+        var logsList = logs.ToList();
+        var allMedsList = allMeds.ToList();
+
         System.Windows.Application.Current?.Dispatcher.Invoke(() =>
         {
             TodayMedicines = new ObservableCollection<Medication>(meds);
-            TodayLogs = new ObservableCollection<IntakeLog>(logs);
-            TotalMedicines = allMeds.Count();
-            TakenToday = logs.Count(l => l.Status == IntakeStatus.Taken);
+            TodayLogs = new ObservableCollection<IntakeLog>(logsList);
+            TotalMedicines = allMedsList.Count;
+            TakenToday = logsList.Count(l => l.Status == IntakeStatus.Taken);
             MissedThisWeek = weekLogs.Count(l => l.Status == IntakeStatus.Dismissed);
+
+            TodayLogsTruncated = new ObservableCollection<IntakeLog>(logsList.Take(3));
+            HasMoreLogs = logsList.Count > 3;
+            ExtraLogsCount = Math.Max(0, logsList.Count - 3);
+
+            AllMedicines = new ObservableCollection<Medication>(allMedsList.Take(5));
+
+            RecentActivityLogs = new ObservableCollection<IntakeLog>(
+                logsList
+                    .Where(l => l.Status == IntakeStatus.Taken || l.Status == IntakeStatus.Dismissed)
+                    .OrderByDescending(l => l.ActionTimestamp ?? l.LoggedAt)
+                    .Take(5));
         });
 
         WeeklyCompliance = await _intakeLogService.GetWeeklyComplianceAsync(_authService.CurrentUser.Id);
@@ -326,6 +360,15 @@ public partial class DashboardViewModel : ObservableObject
     private void CloseChart()
     {
         IsChartExpanded = false;
+    }
+
+    [RelayCommand]
+    private void NavigateToMyMedicines()
+    {
+        var vm = App.Services.GetRequiredService<MyMedicinesViewModel>();
+        _navigationService.NavigateTo(vm);
+        _selectedNavItem = NavItems[1];
+        OnPropertyChanged(nameof(SelectedNavItem));
     }
 
     [RelayCommand]

@@ -142,3 +142,4 @@ d:\Assignments\MediTrack\MediTrack.UI\obj\Debug\net9.0-windows\Views\HistoryView
 d:\Assignments\MediTrack\MediTrack.UI\obj\Debug\net9.0-windows\Views\SettingsView.g.cs
 d:\Assignments\MediTrack\MediTrack.UI\obj\Debug\net9.0-windows\Views\HistoryView.baml
 d:\Assignments\MediTrack\MediTrack.UI\obj\Debug\net9.0-windows\Views\SettingsView.baml
+D:\Assignments\MediTrack\MediTrack.UI\obj\Debug\net9.0-windows\MediTrack.UI.sourcelink.json

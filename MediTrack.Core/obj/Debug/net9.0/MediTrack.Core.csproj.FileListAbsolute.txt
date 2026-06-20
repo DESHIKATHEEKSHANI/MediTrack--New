@@ -10,3 +10,4 @@ D:\Assignments\MediTrack\MediTrack.Core\obj\Debug\net9.0\MediTrack.Core.dll
 D:\Assignments\MediTrack\MediTrack.Core\obj\Debug\net9.0\refint\MediTrack.Core.dll
 D:\Assignments\MediTrack\MediTrack.Core\obj\Debug\net9.0\MediTrack.Core.pdb
 D:\Assignments\MediTrack\MediTrack.Core\obj\Debug\net9.0\ref\MediTrack.Core.dll
+D:\Assignments\MediTrack\MediTrack.Core\obj\Debug\net9.0\MediTrack.Core.sourcelink.json

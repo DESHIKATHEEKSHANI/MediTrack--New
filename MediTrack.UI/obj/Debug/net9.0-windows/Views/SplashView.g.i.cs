@@ -54,7 +54,7 @@ namespace MediTrack.UI.Views {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/MediTrack.UI;component/views/splashview.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/MediTrack.UI;V1.0.0.0;component/views/splashview.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Views\SplashView.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

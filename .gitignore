@@ -1,0 +1,28 @@
+# Build output
+bin/
+obj/
+
+# Debug folders
+**/bin/Debug/
+**/bin/Release/
+**/obj/Debug/
+**/obj/Release/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# NuGet
+*.nupkg
+packages/
+.nuget/
+
+# Logs
+*.log
+
+# OS
+Thumbs.db
+.DS_Store

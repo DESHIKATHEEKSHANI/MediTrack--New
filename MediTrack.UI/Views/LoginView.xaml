@@ -1,0 +1,186 @@
+<UserControl x:Class="MediTrack.UI.Views.LoginView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:MediTrack.UI.ViewModels"
+             xmlns:conv="clr-namespace:MediTrack.UI.Converters">
+    <UserControl.Resources>
+        <conv:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2.2*" MinWidth="380" />
+            <ColumnDefinition Width="3*" MinWidth="480" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Left Panel: Brand -->
+        <Grid Grid.Column="0" Background="#104C7F">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Decorative circles -->
+            <Ellipse Grid.Row="0" Width="200" Height="200" Fill="#1A5C94" Opacity="0.3" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-60,-60,0,0" />
+            <Ellipse Grid.Row="0" Width="140" Height="140" Fill="#1A5C94" Opacity="0.2" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-40,-20,0" />
+            <Ellipse Grid.Row="2" Width="180" Height="180" Fill="#1A5C94" Opacity="0.25" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-40,-40" />
+            <Ellipse Grid.Row="2" Width="100" Height="100" Fill="#1A5C94" Opacity="0.15" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="20,0,0,-20" />
+
+            <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Image Source="/Assets/logo-meditrack.png" Width="100" Height="100" RenderTransformOrigin="-0.05,0.598" />
+
+                <StackPanel Margin="0,0,0,4">
+                    <TextBlock Text="MediTrack" FontSize="45" FontWeight="Bold" Foreground="White" RenderTransformOrigin="0.754,0.385" TextAlignment="Center" FontFamily="Trebuchet MS" Width="238" />
+                    <TextBlock Text="Reminder" FontSize="32" FontWeight="Light" Foreground="#90CAF9" FontFamily="Trebuchet MS" Margin="0,0,0,10" TextAlignment="Right" Height="58" />
+                </StackPanel>
+                <TextBlock Text="Your smart medicine reminder." FontSize="14" Foreground="#BBDEFB" FontFamily="Franklin Gothic Demi Cond" TextAlignment="Center" />
+                <TextBlock Text="Never miss a dose again." FontSize="14" Foreground="#BBDEFB" FontFamily="Franklin Gothic Demi Cond" TextAlignment="Center" />
+
+                <StackPanel Margin="0,16,0,0">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
+                        <TextBlock Text="✓" FontSize="14" Foreground="#4CAF50" FontWeight="Bold" Margin="0,0,8,0" />
+                        <TextBlock Text="Track your medicines" FontSize="13" Foreground="White" Opacity="0.9" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
+                        <TextBlock Text="✓" FontSize="14" Foreground="#4CAF50" FontWeight="Bold" Margin="0,0,8,0" />
+                        <TextBlock Text="Smart reminders" FontSize="13" Foreground="White" Opacity="0.9" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
+                        <TextBlock Text="✓" FontSize="14" Foreground="#4CAF50" FontWeight="Bold" Margin="0,0,8,0" />
+                        <TextBlock Text="Health reports" FontSize="13" Foreground="White" Opacity="0.9" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <TextBlock Text="✓" FontSize="14" Foreground="#4CAF50" FontWeight="Bold" Margin="0,0,8,0" />
+                        <TextBlock Text="Refill alerts" FontSize="13" Foreground="White" Opacity="0.9" />
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+
+        <!-- Right Panel: Auth Form -->
+        <Grid Grid.Column="1" Background="White">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel MaxWidth="380" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40,40">
+
+                    <!-- Header -->
+                    <StackPanel Margin="0,0,0,24">
+                        <TextBlock x:Name="ModeTitle" FontSize="26" FontWeight="Bold" Foreground="#1A1A1A" />
+                        <TextBlock x:Name="ModeSubtitle" FontSize="14" Foreground="#888888" />
+                    </StackPanel>
+
+                    <!-- Error -->
+                    <Border Background="#FFEBEE" CornerRadius="8" Padding="12" Margin="0,0,0,16"
+                            Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}">
+                        <TextBlock Text="{Binding ErrorMessage}" Foreground="#C62828" FontSize="13" TextWrapping="Wrap" />
+                    </Border>
+
+                    <!-- Username -->
+                    <StackPanel Margin="0,0,0,14">
+                        <TextBlock Text="Username" FontSize="13" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
+                        <TextBox Text="{Binding Username}" ToolTip="Enter username" Padding="12,10" Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" />
+                    </StackPanel>
+
+                    <!-- Password -->
+                    <StackPanel Margin="0,0,0,14">
+                        <TextBlock Text="Password" FontSize="13" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
+                        <PasswordBox x:Name="PasswordBox" PasswordChanged="PasswordBox_PasswordChanged" ToolTip="Enter password" Padding="12,10" Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" />
+                    </StackPanel>
+
+                    <!-- Register-only fields -->
+                    <StackPanel Visibility="{Binding IsLoginMode, Converter={StaticResource InvertedBooleanToVisibilityConverter}}" Margin="0,0,0,0">
+                        <StackPanel Margin="0,0,0,14">
+                            <TextBlock Text="Confirm Password" FontSize="13" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
+                            <PasswordBox x:Name="ConfirmPasswordBox" PasswordChanged="ConfirmPasswordBox_PasswordChanged" ToolTip="Confirm password" Padding="12,10" Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" />
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,14">
+                            <TextBlock Text="Email" FontSize="13" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
+                            <TextBox Text="{Binding Email}" ToolTip="Enter email" Padding="12,10" Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" />
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,14">
+                            <TextBlock Text="Full Name" FontSize="13" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
+                            <TextBox Text="{Binding FullName}" ToolTip="Enter full name" Padding="12,10" Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Primary Action -->
+                    <Button Command="{Binding LoginCommand}" Content="Sign In" Margin="0,8,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Background="#104C7F" Foreground="White" Padding="14" FontWeight="SemiBold" FontSize="14"
+                            Visibility="{Binding IsLoginMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="Cursor" Value="Hand" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}" CornerRadius="10" Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Command="{Binding RegisterCommand}" Content="Create Account" Margin="0,8,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Background="#104C7F" Foreground="White" Padding="14" FontWeight="SemiBold" FontSize="14"
+                            Visibility="{Binding IsLoginMode, Converter={StaticResource InvertedBooleanToVisibilityConverter}}">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="Cursor" Value="Hand" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}" CornerRadius="10" Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <!-- Divider -->
+                    <Grid Margin="0,18,0,18">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Rectangle Grid.Column="0" Height="1" Fill="#E0E0E0" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1" Text="or" FontSize="12" Foreground="#999999" Margin="12,0" />
+                        <Rectangle Grid.Column="2" Height="1" Fill="#E0E0E0" VerticalAlignment="Center" />
+                    </Grid>
+
+                    <!-- Toggle Mode -->
+                    <Button x:Name="ToggleButton" Command="{Binding ToggleModeCommand}" HorizontalAlignment="Center" Background="Transparent" Foreground="#104C7F" FontWeight="SemiBold" FontSize="13">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="Cursor" Value="Hand" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="Transparent" Padding="8,4">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Foreground" Value="#1565C0" />
+                                        <Setter Property="TextBlock.TextDecorations" Value="Underline" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>

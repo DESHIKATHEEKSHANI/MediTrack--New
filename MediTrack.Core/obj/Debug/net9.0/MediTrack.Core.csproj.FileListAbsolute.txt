@@ -1,0 +1,12 @@
+D:\Assignments\MediTrack\MediTrack.Core\bin\Debug\net9.0\MediTrack.Core.deps.json
+D:\Assignments\MediTrack\MediTrack.Core\bin\Debug\net9.0\MediTrack.Core.dll
+D:\Assignments\MediTrack\MediTrack.Core\bin\Debug\net9.0\MediTrack.Core.pdb
+D:\Assignments\MediTrack\MediTrack.Core\obj\Debug\net9.0\MediTrack.Core.csproj.AssemblyReference.cache
+D:\Assignments\MediTrack\MediTrack.Core\obj\Debug\net9.0\MediTrack.Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\Assignments\MediTrack\MediTrack.Core\obj\Debug\net9.0\MediTrack.Core.AssemblyInfoInputs.cache
+D:\Assignments\MediTrack\MediTrack.Core\obj\Debug\net9.0\MediTrack.Core.AssemblyInfo.cs
+D:\Assignments\MediTrack\MediTrack.Core\obj\Debug\net9.0\MediTrack.Core.csproj.CoreCompileInputs.cache
+D:\Assignments\MediTrack\MediTrack.Core\obj\Debug\net9.0\MediTrack.Core.dll
+D:\Assignments\MediTrack\MediTrack.Core\obj\Debug\net9.0\refint\MediTrack.Core.dll
+D:\Assignments\MediTrack\MediTrack.Core\obj\Debug\net9.0\MediTrack.Core.pdb
+D:\Assignments\MediTrack\MediTrack.Core\obj\Debug\net9.0\ref\MediTrack.Core.dll

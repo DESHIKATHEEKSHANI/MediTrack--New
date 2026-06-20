@@ -1,0 +1,488 @@
+<UserControl x:Class="MediTrack.UI.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:MediTrack.UI.ViewModels"
+             xmlns:conv="clr-namespace:MediTrack.UI.Converters"
+             xmlns:models="clr-namespace:MediTrack.UI.Models">
+    <UserControl.Resources>
+        <conv:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+        <Style x:Key="NavItemStyle" TargetType="Border">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Padding" Value="16,10" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                    <Setter Property="Background" Value="#1565C0" />
+                </DataTrigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#1565C0" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="240" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar -->
+        <Grid Grid.Column="0" Background="#104C7F">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Margin="24,24,24,16" Orientation="Horizontal">
+                <Image Source="/Assets/logo-meditrack.png" Width="40" Height="40" Margin="0,0,10,0" VerticalAlignment="Top" />
+                <StackPanel>
+                    <TextBlock Text="MediTrack" FontSize="24" FontWeight="Bold" Foreground="White" />
+                    <TextBlock Text="Reminder" FontSize="14" Foreground="#90CAF9" />
+                </StackPanel>
+            </StackPanel>
+
+            <ListBox Grid.Row="1" ItemsSource="{Binding NavItems}" SelectedItem="{Binding SelectedNavItem}" Background="Transparent" BorderThickness="0" Margin="12,0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type models:NavItem}">
+                        <Border Style="{StaticResource NavItemStyle}">
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse Width="8" Height="8" Fill="White" Margin="0,0,12,0" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding Label}" Foreground="White" FontSize="14" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <Border Grid.Row="2" Background="#0D3A66" Padding="16" Margin="12,0,12,12" CornerRadius="8">
+                <StackPanel>
+                    <TextBlock Text="{Binding WelcomeMessage}" FontSize="12" Foreground="#BBDEFB" TextTrimming="CharacterEllipsis" />
+                    <Button Command="{Binding LogoutCommand}" Background="Transparent" Foreground="White" FontSize="12" HorizontalAlignment="Left" Padding="0" Margin="0,4,0,0" BorderThickness="0">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="M17,7L15.59,8.41L18.17,11H8V13H18.17L15.59,15.58L17,17L22,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12V20H20V12A8,8 0 0,1 12,4A8,8 0 0,1 20,12V18H18V12A6,6 0 0,0 12,6A6,6 0 0,0 6,12V18H4V12A8,8 0 0,1 12,4" Fill="White" Width="14" Height="14" Stretch="Uniform" Margin="0,0,6,0" VerticalAlignment="Center" />
+                            <TextBlock Text="Logout" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Main Content -->
+        <Grid Grid.Column="1" Background="#F8F9FA">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Top Bar -->
+            <Border Grid.Row="0" Background="White" Padding="24,16" Margin="0,0,0,1">
+                <Border.Effect>
+                    <DropShadowEffect ShadowDepth="0" BlurRadius="4" Opacity="0.06" Color="#000000" />
+                </Border.Effect>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="{Binding HeaderGreeting}" FontSize="22" FontWeight="Bold" Foreground="#1A1A1A" />
+                        <TextBlock Text="{Binding CurrentDate}" FontSize="13" Foreground="#888888" Margin="0,2,0,0" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
+                        <TextBlock Text="{Binding CurrentTime}" FontSize="18" FontWeight="SemiBold" Foreground="#104C7F" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <Button Grid.Column="2" Content="+ Add Medicine" Command="{Binding ShowAddMedicationCommand}" Background="#104C7F" Foreground="White" Padding="12,8" FontWeight="SemiBold" BorderThickness="0">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- Content Area -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="24">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Stats Cards -->
+                    <Grid Grid.Row="0" Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Background="White" CornerRadius="12" Padding="20" Margin="0,0,8,0">
+                            <Border.Effect><DropShadowEffect ShadowDepth="0" BlurRadius="12" Opacity="0.06" Color="#000000" /></Border.Effect>
+                            <StackPanel>
+                                <TextBlock Text="Total Medicines" FontSize="12" Foreground="#888888" />
+                                <TextBlock Text="{Binding TotalMedicines}" FontSize="28" FontWeight="Bold" Foreground="#1A1A1A" Margin="0,4,0,0" />
+                                <TextBlock Text="Active prescriptions" FontSize="11" Foreground="#AAAAAA" Margin="0,2,0,0" />
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="1" Background="White" CornerRadius="12" Padding="20" Margin="8,0,8,0">
+                            <Border.Effect><DropShadowEffect ShadowDepth="0" BlurRadius="12" Opacity="0.06" Color="#000000" /></Border.Effect>
+                            <StackPanel>
+                                <TextBlock Text="Taken Today" FontSize="12" Foreground="#888888" />
+                                <TextBlock Text="{Binding TakenToday}" FontSize="28" FontWeight="Bold" Foreground="#1A1A1A" Margin="0,4,0,0" />
+                                <TextBlock Text="Scheduled for today" FontSize="11" Foreground="#AAAAAA" Margin="0,2,0,0" />
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="2" Background="White" CornerRadius="12" Padding="20" Margin="8,0,8,0">
+                            <Border.Effect><DropShadowEffect ShadowDepth="0" BlurRadius="12" Opacity="0.06" Color="#000000" /></Border.Effect>
+                            <StackPanel>
+                                <TextBlock Text="Missed This Week" FontSize="12" Foreground="#888888" />
+                                <TextBlock Text="{Binding MissedThisWeek}" FontSize="28" FontWeight="Bold" Foreground="#D32F2F" Margin="0,4,0,0" />
+                                <TextBlock Text="Last 7 days" FontSize="11" Foreground="#AAAAAA" Margin="0,2,0,0" />
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="3" Background="White" CornerRadius="12" Padding="20" Margin="8,0,0,0">
+                            <Border.Effect><DropShadowEffect ShadowDepth="0" BlurRadius="12" Opacity="0.06" Color="#000000" /></Border.Effect>
+                            <StackPanel>
+                                <TextBlock Text="Weekly Adherence" FontSize="12" Foreground="#888888" />
+                                <TextBlock Text="{Binding WeeklyCompliance, StringFormat='{}{0:F0}%'}" FontSize="28" FontWeight="Bold" Foreground="#4CAF50" Margin="0,4,0,0" />
+                                <TextBlock Text="Last 7 days average" FontSize="11" Foreground="#AAAAAA" Margin="0,2,0,0" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- Row 2 -->
+                    <Grid Grid.Row="1" Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2.2*" />
+                            <ColumnDefinition Width="1.2*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Today's Medicines -->
+                        <Border Grid.Column="0" Background="White" CornerRadius="12" Padding="20" Margin="0,0,12,0">
+                            <Border.Effect><DropShadowEffect ShadowDepth="0" BlurRadius="12" Opacity="0.06" Color="#000000" /></Border.Effect>
+                            <StackPanel>
+                                <Grid Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Today's Medicines" FontSize="16" FontWeight="SemiBold" Foreground="#1A1A1A" />
+                                    <Button Grid.Column="1" Content="View Schedule" Command="{Binding RefreshCommand}" Background="#E3F2FD" Foreground="#104C7F" Padding="8,4" FontSize="12" BorderThickness="0" />
+                                </Grid>
+                                <ItemsControl ItemsSource="{Binding TodayLogs}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="#F8F9FA" CornerRadius="8" Padding="12" Margin="0,0,0,8">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Grid.Column="0">
+                                                        <TextBlock Text="{Binding Medication.DisplayName}" FontWeight="SemiBold" Foreground="#1A1A1A" />
+                                                        <TextBlock Text="{Binding ScheduledDateTime, StringFormat='Scheduled: {0:hh:mm tt}'}" FontSize="12" Foreground="#888888" />
+                                                        <TextBlock Text="{Binding Status}" FontSize="12" FontWeight="Bold" Foreground="#666666" />
+                                                    </StackPanel>
+                                                    <Button Grid.Column="1" Content="Taken" Command="{Binding DataContext.MarkTakenCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#4CAF50" Foreground="White" Padding="8,4" Margin="0,0,6,0" BorderThickness="0" FontSize="12" />
+                                                    <Button Grid.Column="2" Content="Skip" Command="{Binding DataContext.MarkDismissedCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#FF9800" Foreground="White" Padding="8,4" BorderThickness="0" FontSize="12" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Right Column -->
+                        <StackPanel Grid.Column="1">
+                            <!-- Next Dose -->
+                            <Border Background="White" CornerRadius="12" Padding="20" Margin="0,0,0,12">
+                                <Border.Effect><DropShadowEffect ShadowDepth="0" BlurRadius="12" Opacity="0.06" Color="#000000" /></Border.Effect>
+                                <StackPanel>
+                                    <TextBlock Text="Next Dose Required" FontSize="12" Foreground="#888888" />
+                                    <TextBlock Text="{Binding NextDoseTime}" FontSize="28" FontWeight="Bold" Foreground="#104C7F" Margin="0,4,0,0" />
+                                    <TextBlock Text="{Binding NextDoseMedicine}" FontSize="13" Foreground="#1A1A1A" Margin="0,2,0,0" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Weekly Chart -->
+                            <Border Background="White" CornerRadius="12" Padding="20" Margin="0,0,0,12">
+                                <Border.Effect><DropShadowEffect ShadowDepth="0" BlurRadius="12" Opacity="0.06" Color="#000000" /></Border.Effect>
+                                <Grid>
+                                    <StackPanel>
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="Weekly Adherence" FontSize="14" FontWeight="SemiBold" Foreground="#1A1A1A" VerticalAlignment="Center" />
+                                            <Button Grid.Column="1" Content="⛶" Command="{Binding ExpandChartCommand}" Background="Transparent" Foreground="#888888" FontSize="16" Padding="4" BorderThickness="0" VerticalAlignment="Center" />
+                                        </Grid>
+                                        <ItemsControl ItemsSource="{Binding WeeklyAdherenceBars}" Height="180">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <UniformGrid Columns="7" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate DataType="{x:Type models:WeeklyBarItem}">
+                                                    <Grid Height="160">
+                                                        <TextBlock Text="{Binding Value, StringFormat={}{0:F0}%}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="11" Foreground="#104C7F" Margin="0,2,0,0" />
+                                                        <Grid VerticalAlignment="Bottom" Height="120" Margin="4,0">
+                                                            <Border Background="#E3F2FD" CornerRadius="4" />
+                                                            <Border Background="#104C7F" Height="{Binding BarHeightSmall}" VerticalAlignment="Bottom" CornerRadius="4" />
+                                                        </Grid>
+                                                        <TextBlock Text="{Binding Label}" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="11" Foreground="#888888" Margin="0,0,0,2" />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- Recent Activity -->
+                            <Border Background="White" CornerRadius="12" Padding="20">
+                                <Border.Effect><DropShadowEffect ShadowDepth="0" BlurRadius="12" Opacity="0.06" Color="#000000" /></Border.Effect>
+                                <StackPanel>
+                                    <TextBlock Text="Recent Activity" FontSize="14" FontWeight="SemiBold" Foreground="#1A1A1A" Margin="0,0,0,8" />
+                                    <ItemsControl ItemsSource="{Binding TodayLogs}" MaxHeight="200">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                                    <Ellipse Width="8" Height="8" Fill="#4CAF50" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{Binding Medication.DisplayName}" FontSize="12" Foreground="#1A1A1A" />
+                                                    <TextBlock Text=" - " FontSize="12" Foreground="#888888" />
+                                                    <TextBlock Text="{Binding Status}" FontSize="12" Foreground="#888888" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- My Medications Table -->
+                    <Border Grid.Row="2" Background="White" CornerRadius="12" Padding="20" Margin="0,0,0,20">
+                        <Border.Effect><DropShadowEffect ShadowDepth="0" BlurRadius="12" Opacity="0.06" Color="#000000" /></Border.Effect>
+                        <StackPanel>
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="My Medications" FontSize="16" FontWeight="SemiBold" Foreground="#1A1A1A" />
+                                <Button Grid.Column="1" Content="+ Add" Command="{Binding ShowAddMedicationCommand}" Background="#104C7F" Foreground="White" Padding="10,6" FontSize="12" BorderThickness="0" />
+                            </Grid>
+                            <ItemsControl ItemsSource="{Binding TodayMedicines}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="#F0F0F0" BorderThickness="0,0,0,1" Padding="10,8">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Grid.Column="0">
+                                                    <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" Foreground="#1A1A1A" />
+                                                    <TextBlock FontSize="12" Foreground="#888888">
+                                                        <TextBlock.Text>
+                                                            <MultiBinding StringFormat="{}{0} {1} at {2}">
+                                                                <Binding Path="DosageValue" />
+                                                                <Binding Path="DosageUnit" />
+                                                                <Binding Path="ScheduledTime" />
+                                                            </MultiBinding>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                </StackPanel>
+                                                <Button Grid.Column="1" Content="Edit" Command="{Binding DataContext.ShowEditMedicationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#E3F2FD" Foreground="#104C7F" Padding="8,4" Margin="0,0,6,0" BorderThickness="0" FontSize="12" />
+                                                <Button Grid.Column="2" Content="Delete" Command="{Binding DataContext.DeleteMedicationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#FFEBEE" Foreground="#D32F2F" Padding="8,4" BorderThickness="0" FontSize="12" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </ScrollViewer>
+
+            <!-- Add/Edit Medication Overlay -->
+            <Grid Grid.RowSpan="2" Background="#AA000000" Visibility="{Binding IsMedicationPopupOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Border Background="White" CornerRadius="16" Width="560" Padding="28" HorizontalAlignment="Center" VerticalAlignment="Center" MaxHeight="700">
+                    <Border.Effect><DropShadowEffect ShadowDepth="0" BlurRadius="24" Opacity="0.4" Color="#000000" /></Border.Effect>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <TextBlock FontSize="20" FontWeight="SemiBold" Foreground="#1A1A1A" Margin="0,0,0,20">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="Add New Medicine" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                                <Setter Property="Text" Value="Edit Medicine" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+
+                            <!-- Section: Basic Info -->
+                            <Border BorderBrush="#E3F2FD" BorderThickness="0,0,0,1" Margin="0,0,0,8">
+                                <TextBlock Text="Basic Information" FontSize="13" FontWeight="SemiBold" Foreground="#104C7F" Margin="0,0,0,4" />
+                            </Border>
+                            <TextBlock Text="Medicine Name *" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
+                            <TextBox Text="{Binding SelectedMedication.OfficialName}" Padding="10,8" Background="#F8F9FA" BorderBrush="#E0E0E0" Margin="0,0,0,12" />
+
+                            <TextBlock Text="Display Name (optional)" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
+                            <TextBox Text="{Binding SelectedMedication.DisplayName}" Padding="10,8" Background="#F8F9FA" BorderBrush="#E0E0E0" Margin="0,0,0,12" />
+
+                            <TextBlock Text="Medicine Type" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
+                            <ComboBox ItemsSource="{Binding MedicineTypes}" SelectedItem="{Binding SelectedMedication.MedicineType}" Padding="8,6" Background="#F8F9FA" BorderBrush="#E0E0E0" Margin="0,0,0,12" />
+
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                                    <TextBlock Text="Dose Amount *" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
+                                    <TextBox Text="{Binding SelectedMedication.DosageValue}" Padding="10,8" Background="#F8F9FA" BorderBrush="#E0E0E0" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                                    <TextBlock Text="Dose Unit" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
+                                    <ComboBox ItemsSource="{Binding DosageUnits}" SelectedItem="{Binding SelectedMedication.DosageUnit}" Padding="8,6" Background="#F8F9FA" BorderBrush="#E0E0E0" />
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Section: Schedule -->
+                            <Border BorderBrush="#E3F2FD" BorderThickness="0,0,0,1" Margin="0,12,0,8">
+                                <TextBlock Text="Schedule" FontSize="13" FontWeight="SemiBold" Foreground="#104C7F" Margin="0,0,0,4" />
+                            </Border>
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                                    <TextBlock Text="Frequency" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
+                                    <ComboBox ItemsSource="{Binding Frequencies}" SelectedItem="{Binding SelectedMedication.Frequency}" Padding="8,6" Background="#F8F9FA" BorderBrush="#E0E0E0" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                                    <TextBlock Text="Meal Timing" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
+                                    <ComboBox ItemsSource="{Binding MealTimings}" SelectedItem="{Binding SelectedMedication.MealTiming}" Padding="8,6" Background="#F8F9FA" BorderBrush="#E0E0E0" />
+                                </StackPanel>
+                            </Grid>
+
+                            <TextBlock Text="Reminder Times (comma-separated, e.g. 08:00,20:00)" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
+                            <TextBox Text="{Binding SelectedMedication.ReminderTimes}" Padding="10,8" Background="#F8F9FA" BorderBrush="#E0E0E0" Margin="0,0,0,12" />
+
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                                    <TextBlock Text="Start Date *" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
+                                    <DatePicker SelectedDate="{Binding SelectedMedication.StartDate}" Padding="8,6" Background="#F8F9FA" BorderBrush="#E0E0E0" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                                    <TextBlock Text="End Date" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
+                                    <DatePicker SelectedDate="{Binding SelectedMedication.EndDate}" Padding="8,6" Background="#F8F9FA" BorderBrush="#E0E0E0" />
+                                </StackPanel>
+                            </Grid>
+
+                            <CheckBox Content="Ongoing medication (no end date)" IsChecked="{Binding SelectedMedication.IsOngoing}" Foreground="#555555" Margin="0,0,0,12" />
+
+                            <!-- Section: Stock & Notes -->
+                            <Border BorderBrush="#E3F2FD" BorderThickness="0,0,0,1" Margin="0,12,0,8">
+                                <TextBlock Text="Stock &amp; Instructions" FontSize="13" FontWeight="SemiBold" Foreground="#104C7F" Margin="0,0,0,4" />
+                            </Border>
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                                    <TextBlock Text="Remaining Pills" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
+                                    <TextBox Text="{Binding SelectedMedication.RemainingPills}" Padding="10,8" Background="#F8F9FA" BorderBrush="#E0E0E0" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                                    <TextBlock Text="Low Stock Alert At" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
+                                    <TextBox Text="{Binding SelectedMedication.LowStockAlertAt}" Padding="10,8" Background="#F8F9FA" BorderBrush="#E0E0E0" />
+                                </StackPanel>
+                            </Grid>
+
+                            <TextBlock Text="Instructions" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
+                            <TextBox Text="{Binding SelectedMedication.IntakeInstructions}" Padding="10,8" Background="#F8F9FA" BorderBrush="#E0E0E0" Margin="0,0,0,20" TextWrapping="Wrap" AcceptsReturn="True" Height="60" />
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Content="Cancel" Command="{Binding ClosePopupCommand}" Background="Transparent" Foreground="#666666" Padding="12,8" Margin="0,0,8,0" BorderThickness="0" />
+                                <Button Content="Save Medicine" Command="{Binding SaveMedicationCommand}" Background="#104C7F" Foreground="White" Padding="16,8" BorderThickness="0">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+
+            <!-- Full Screen Chart Overlay -->
+            <Grid Grid.RowSpan="2" Background="#AA000000" Visibility="{Binding IsChartExpanded, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Border Background="White" CornerRadius="16" Padding="32" HorizontalAlignment="Center" VerticalAlignment="Center" Width="800" Height="500">
+                    <Border.Effect><DropShadowEffect ShadowDepth="0" BlurRadius="24" Opacity="0.4" Color="#000000" /></Border.Effect>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0" Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Weekly Adherence - Full View" FontSize="20" FontWeight="SemiBold" Foreground="#1A1A1A" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Content="✕" Command="{Binding CloseChartCommand}" Background="Transparent" Foreground="#666666" FontSize="18" Padding="8" BorderThickness="0" VerticalAlignment="Center" />
+                        </Grid>
+                        <ItemsControl ItemsSource="{Binding WeeklyAdherenceBars}" Grid.Row="1">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="7" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type models:WeeklyBarItem}">
+                                    <Grid Height="380">
+                                        <TextBlock Text="{Binding Value, StringFormat={}{0:F0}%}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="14" Foreground="#104C7F" Margin="0,4,0,0" />
+                                        <Grid VerticalAlignment="Bottom" Height="300" Margin="12,0">
+                                            <Border Background="#E3F2FD" CornerRadius="6" />
+                                            <Border Background="#104C7F" Height="{Binding BarHeightLarge}" VerticalAlignment="Bottom" CornerRadius="6" />
+                                        </Grid>
+                                        <TextBlock Text="{Binding Label}" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="14" Foreground="#888888" Margin="0,0,0,4" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Grid.Row="2" Text="Adherence percentage across the last 7 days" FontSize="13" Foreground="#888888" Margin="0,12,0,0" />
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

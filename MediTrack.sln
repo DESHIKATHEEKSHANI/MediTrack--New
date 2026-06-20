@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.4.11612.150 stable
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediTrack.UI", "MediTrack.UI\MediTrack.UI.csproj", "{60865380-5DC5-45EA-9269-090A96CBFDE7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediTrack.Core", "MediTrack.Core\MediTrack.Core.csproj", "{C60B9A6D-99A3-4D52-9BC6-5C808A3CFFCE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{60865380-5DC5-45EA-9269-090A96CBFDE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60865380-5DC5-45EA-9269-090A96CBFDE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60865380-5DC5-45EA-9269-090A96CBFDE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60865380-5DC5-45EA-9269-090A96CBFDE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C60B9A6D-99A3-4D52-9BC6-5C808A3CFFCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C60B9A6D-99A3-4D52-9BC6-5C808A3CFFCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C60B9A6D-99A3-4D52-9BC6-5C808A3CFFCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C60B9A6D-99A3-4D52-9BC6-5C808A3CFFCE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D0577E12-14B7-418B-8FD5-6FF9F0DFCEDB}
+	EndGlobalSection
+EndGlobal

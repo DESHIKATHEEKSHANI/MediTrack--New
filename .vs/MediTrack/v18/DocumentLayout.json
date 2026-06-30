@@ -3,16 +3,44 @@
   "WorkspaceRootPath": "D:\\Assignments\\MediTrack\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{C60B9A6D-99A3-4D52-9BC6-5C808A3CFFCE}|MediTrack.Core\\MediTrack.Core.csproj|d:\\assignments\\meditrack\\meditrack.core\\services\\reminderengine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C60B9A6D-99A3-4D52-9BC6-5C808A3CFFCE}|MediTrack.Core\\MediTrack.Core.csproj|solutionrelative:meditrack.core\\services\\reminderengine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{60865380-5DC5-45EA-9269-090A96CBFDE7}|MediTrack.UI\\MediTrack.UI.csproj|d:\\assignments\\meditrack\\meditrack.ui\\viewmodels\\mymedicinesviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{60865380-5DC5-45EA-9269-090A96CBFDE7}|MediTrack.UI\\MediTrack.UI.csproj|solutionrelative:meditrack.ui\\viewmodels\\mymedicinesviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C60B9A6D-99A3-4D52-9BC6-5C808A3CFFCE}|MediTrack.Core\\MediTrack.Core.csproj|d:\\assignments\\meditrack\\meditrack.core\\data\\meditrackdbcontextfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C60B9A6D-99A3-4D52-9BC6-5C808A3CFFCE}|MediTrack.Core\\MediTrack.Core.csproj|solutionrelative:meditrack.core\\data\\meditrackdbcontextfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{60865380-5DC5-45EA-9269-090A96CBFDE7}|MediTrack.UI\\MediTrack.UI.csproj|d:\\assignments\\meditrack\\meditrack.ui\\views\\loginview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{60865380-5DC5-45EA-9269-090A96CBFDE7}|MediTrack.UI\\MediTrack.UI.csproj|solutionrelative:meditrack.ui\\views\\loginview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{60865380-5DC5-45EA-9269-090A96CBFDE7}|MediTrack.UI\\MediTrack.UI.csproj|d:\\assignments\\meditrack\\meditrack.ui\\views\\loginview.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{60865380-5DC5-45EA-9269-090A96CBFDE7}|MediTrack.UI\\MediTrack.UI.csproj|solutionrelative:meditrack.ui\\views\\loginview.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{60865380-5DC5-45EA-9269-090A96CBFDE7}|MediTrack.UI\\MediTrack.UI.csproj|d:\\assignments\\meditrack\\meditrack.ui\\views\\scheduleview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{60865380-5DC5-45EA-9269-090A96CBFDE7}|MediTrack.UI\\MediTrack.UI.csproj|solutionrelative:meditrack.ui\\views\\scheduleview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{60865380-5DC5-45EA-9269-090A96CBFDE7}|MediTrack.UI\\MediTrack.UI.csproj|d:\\assignments\\meditrack\\meditrack.ui\\views\\settingsview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{60865380-5DC5-45EA-9269-090A96CBFDE7}|MediTrack.UI\\MediTrack.UI.csproj|solutionrelative:meditrack.ui\\views\\settingsview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{60865380-5DC5-45EA-9269-090A96CBFDE7}|MediTrack.UI\\MediTrack.UI.csproj|d:\\assignments\\meditrack\\meditrack.ui\\views\\historyview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{60865380-5DC5-45EA-9269-090A96CBFDE7}|MediTrack.UI\\MediTrack.UI.csproj|solutionrelative:meditrack.ui\\views\\historyview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{60865380-5DC5-45EA-9269-090A96CBFDE7}|MediTrack.UI\\MediTrack.UI.csproj|d:\\assignments\\meditrack\\meditrack.ui\\views\\dashboardview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{60865380-5DC5-45EA-9269-090A96CBFDE7}|MediTrack.UI\\MediTrack.UI.csproj|solutionrelative:meditrack.ui\\views\\dashboardview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{60865380-5DC5-45EA-9269-090A96CBFDE7}|MediTrack.UI\\MediTrack.UI.csproj|d:\\assignments\\meditrack\\meditrack.ui\\views\\dashboardview.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{60865380-5DC5-45EA-9269-090A96CBFDE7}|MediTrack.UI\\MediTrack.UI.csproj|solutionrelative:meditrack.ui\\views\\dashboardview.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{60865380-5DC5-45EA-9269-090A96CBFDE7}|MediTrack.UI\\MediTrack.UI.csproj|d:\\assignments\\meditrack\\meditrack.ui\\views\\loginview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{60865380-5DC5-45EA-9269-090A96CBFDE7}|MediTrack.UI\\MediTrack.UI.csproj|solutionrelative:meditrack.ui\\views\\loginview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{60865380-5DC5-45EA-9269-090A96CBFDE7}|MediTrack.UI\\MediTrack.UI.csproj|d:\\assignments\\meditrack\\meditrack.ui\\views\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
@@ -58,7 +86,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Bookmark",
@@ -66,7 +94,94 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ReminderEngine.cs",
+              "DocumentMoniker": "D:\\Assignments\\MediTrack\\MediTrack.Core\\Services\\ReminderEngine.cs",
+              "RelativeDocumentMoniker": "MediTrack.Core\\Services\\ReminderEngine.cs",
+              "ToolTip": "D:\\Assignments\\MediTrack\\MediTrack.Core\\Services\\ReminderEngine.cs",
+              "RelativeToolTip": "MediTrack.Core\\Services\\ReminderEngine.cs",
+              "ViewState": "AgIAAFYAAAAAAAAAAAAswBkAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-29T20:53:09.505Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "MyMedicinesViewModel.cs",
+              "DocumentMoniker": "D:\\Assignments\\MediTrack\\MediTrack.UI\\ViewModels\\MyMedicinesViewModel.cs",
+              "RelativeDocumentMoniker": "MediTrack.UI\\ViewModels\\MyMedicinesViewModel.cs",
+              "ToolTip": "D:\\Assignments\\MediTrack\\MediTrack.UI\\ViewModels\\MyMedicinesViewModel.cs",
+              "RelativeToolTip": "MediTrack.UI\\ViewModels\\MyMedicinesViewModel.cs",
+              "ViewState": "AgIAAIIAAAAAAAAAAAAwwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-29T20:47:47.398Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "MediTrackDbContextFactory.cs",
+              "DocumentMoniker": "D:\\Assignments\\MediTrack\\MediTrack.Core\\Data\\MediTrackDbContextFactory.cs",
+              "RelativeDocumentMoniker": "MediTrack.Core\\Data\\MediTrackDbContextFactory.cs",
+              "ToolTip": "D:\\Assignments\\MediTrack\\MediTrack.Core\\Data\\MediTrackDbContextFactory.cs",
+              "RelativeToolTip": "MediTrack.Core\\Data\\MediTrackDbContextFactory.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-29T20:47:29.334Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "LoginView.xaml.cs",
+              "DocumentMoniker": "D:\\Assignments\\MediTrack\\MediTrack.UI\\Views\\LoginView.xaml.cs",
+              "RelativeDocumentMoniker": "MediTrack.UI\\Views\\LoginView.xaml.cs",
+              "ToolTip": "D:\\Assignments\\MediTrack\\MediTrack.UI\\Views\\LoginView.xaml.cs",
+              "RelativeToolTip": "MediTrack.UI\\Views\\LoginView.xaml.cs",
+              "ViewState": "AgIAABwAAAAAAAAAAAArwDAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-29T19:47:50.233Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ScheduleView.xaml",
+              "DocumentMoniker": "D:\\Assignments\\MediTrack\\MediTrack.UI\\Views\\ScheduleView.xaml",
+              "RelativeDocumentMoniker": "MediTrack.UI\\Views\\ScheduleView.xaml",
+              "ToolTip": "D:\\Assignments\\MediTrack\\MediTrack.UI\\Views\\ScheduleView.xaml",
+              "RelativeToolTip": "MediTrack.UI\\Views\\ScheduleView.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-06-29T19:46:59.807Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "SettingsView.xaml",
+              "DocumentMoniker": "D:\\Assignments\\MediTrack\\MediTrack.UI\\Views\\SettingsView.xaml",
+              "RelativeDocumentMoniker": "MediTrack.UI\\Views\\SettingsView.xaml",
+              "ToolTip": "D:\\Assignments\\MediTrack\\MediTrack.UI\\Views\\SettingsView.xaml",
+              "RelativeToolTip": "MediTrack.UI\\Views\\SettingsView.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-06-29T19:46:34.334Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "HistoryView.xaml",
+              "DocumentMoniker": "D:\\Assignments\\MediTrack\\MediTrack.UI\\Views\\HistoryView.xaml",
+              "RelativeDocumentMoniker": "MediTrack.UI\\Views\\HistoryView.xaml",
+              "ToolTip": "D:\\Assignments\\MediTrack\\MediTrack.UI\\Views\\HistoryView.xaml",
+              "RelativeToolTip": "MediTrack.UI\\Views\\HistoryView.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-06-20T23:15:35.167Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
               "Title": "DashboardView.xaml.cs",
               "DocumentMoniker": "D:\\Assignments\\MediTrack\\MediTrack.UI\\Views\\DashboardView.xaml.cs",
               "RelativeDocumentMoniker": "MediTrack.UI\\Views\\DashboardView.xaml.cs",
@@ -74,24 +189,22 @@
               "RelativeToolTip": "MediTrack.UI\\Views\\DashboardView.xaml.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAALAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-20T19:40:15.964Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-06-20T19:40:15.964Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 8,
               "Title": "DashboardView.xaml",
               "DocumentMoniker": "D:\\Assignments\\MediTrack\\MediTrack.UI\\Views\\DashboardView.xaml",
               "RelativeDocumentMoniker": "MediTrack.UI\\Views\\DashboardView.xaml",
               "ToolTip": "D:\\Assignments\\MediTrack\\MediTrack.UI\\Views\\DashboardView.xaml",
               "RelativeToolTip": "MediTrack.UI\\Views\\DashboardView.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-06-20T19:38:04.315Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-06-20T19:38:04.315Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 12,
               "Title": "LoginViewModel.cs",
               "DocumentMoniker": "D:\\Assignments\\MediTrack\\MediTrack.UI\\ViewModels\\LoginViewModel.cs",
               "RelativeDocumentMoniker": "MediTrack.UI\\ViewModels\\LoginViewModel.cs",
@@ -103,7 +216,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 13,
               "Title": "MediTrack.UI.csproj",
               "DocumentMoniker": "D:\\Assignments\\MediTrack\\MediTrack.UI\\MediTrack.UI.csproj",
               "RelativeDocumentMoniker": "MediTrack.UI\\MediTrack.UI.csproj",
@@ -115,7 +228,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "LoginView.xaml",
               "DocumentMoniker": "D:\\Assignments\\MediTrack\\MediTrack.UI\\Views\\LoginView.xaml",
               "RelativeDocumentMoniker": "MediTrack.UI\\Views\\LoginView.xaml",
@@ -127,7 +240,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 10,
               "Title": "MainWindow.xaml",
               "DocumentMoniker": "D:\\Assignments\\MediTrack\\MediTrack.UI\\Views\\MainWindow.xaml",
               "RelativeDocumentMoniker": "MediTrack.UI\\Views\\MainWindow.xaml",
@@ -138,7 +251,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 11,
               "Title": "SplashView.xaml",
               "DocumentMoniker": "D:\\Assignments\\MediTrack\\MediTrack.UI\\Views\\SplashView.xaml",
               "RelativeDocumentMoniker": "MediTrack.UI\\Views\\SplashView.xaml",
@@ -149,7 +262,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 14,
               "Title": "DashboardView.axaml",
               "DocumentMoniker": "D:\\Assignments\\MediTrack\\MediTrack.UI\\Views\\DashboardView.axaml",
               "RelativeDocumentMoniker": "MediTrack.UI\\Views\\DashboardView.axaml",
@@ -160,7 +273,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 15,
               "Title": "LoginView.axaml",
               "DocumentMoniker": "D:\\Assignments\\MediTrack\\MediTrack.UI\\Views\\LoginView.axaml",
               "RelativeDocumentMoniker": "MediTrack.UI\\Views\\LoginView.axaml",
@@ -172,7 +285,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 16,
               "Title": "App.axaml",
               "DocumentMoniker": "D:\\Assignments\\MediTrack\\MediTrack.UI\\App.axaml",
               "RelativeDocumentMoniker": "MediTrack.UI\\App.axaml",
@@ -184,7 +297,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 17,
               "Title": "SplashView.axaml",
               "DocumentMoniker": "D:\\Assignments\\MediTrack\\MediTrack.UI\\Views\\SplashView.axaml",
               "RelativeDocumentMoniker": "MediTrack.UI\\Views\\SplashView.axaml",
@@ -196,7 +309,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 18,
               "Title": "SplashView.axaml",
               "DocumentMoniker": "D:\\Assignments\\MediTrack\\MediTrack.UI\\Views\\SplashView.axaml",
               "RelativeDocumentMoniker": "MediTrack.UI\\Views\\SplashView.axaml",

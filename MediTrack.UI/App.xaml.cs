@@ -60,10 +60,30 @@ public partial class App : System.Windows.Application
         {
             Dispatcher.BeginInvoke(() =>
             {
-                var alertVm = new AlertViewModel(intakeLogService, args.Medication, args.ScheduledTime, () => { });
-                var alertWindow = new AlertWindow(alertVm);
+                System.Media.SystemSounds.Exclamation.Play();
+                AlertWindow? alertWindow = null;
+                var alertVm = new AlertViewModel(intakeLogService, args.Medication, args.ScheduledTime,
+                    () => System.Windows.Application.Current.Dispatcher.Invoke(() => alertWindow?.Close()));
+                alertVm.OnSnooze = () =>
+                {
+                    reminderEngine.SnoozeReminder(args.Medication.Id, args.ScheduledTime, alertVm.SnoozeMinutes);
+                };
+                alertWindow = new AlertWindow(alertVm);
                 alertWindow.Closed += (_, _) => alertWindow.DataContext = null;
                 alertWindow.Show();
+            });
+        };
+
+        intakeLogService.LowStockAlertTriggered += (_, med) =>
+        {
+            Dispatcher.BeginInvoke(() =>
+            {
+                System.Media.SystemSounds.Hand.Play();
+                System.Windows.MessageBox.Show(
+                    $"{med.DisplayName ?? med.OfficialName} is running low. Only {med.RemainingPills} pill(s) remaining.",
+                    "Low Stock Alert",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             });
         };
 

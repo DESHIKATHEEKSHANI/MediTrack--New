@@ -72,7 +72,7 @@
                     <DataTemplate DataType="{x:Type models:NavItem}">
                         <Border Style="{StaticResource NavItemStyle}">
                             <StackPanel Orientation="Horizontal">
-                                <Ellipse Width="8" Height="8" Fill="White" Margin="0,0,12,0" VerticalAlignment="Center" />
+                                <Path Data="{Binding Icon}" Fill="White" Width="16" Height="16" Stretch="Uniform" Margin="0,0,12,0" VerticalAlignment="Center" />
                                 <TextBlock Text="{Binding Label}" Foreground="White" FontSize="14" VerticalAlignment="Center" />
                             </StackPanel>
                         </Border>
@@ -111,8 +111,8 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                        <TextBlock Text="History" FontSize="22" FontWeight="Bold" Foreground="#1A1A1A" />
-                        <TextBlock Text="Your medication intake history" FontSize="13" Foreground="#888888" Margin="0,2,0,0" />
+                        <TextBlock Text="Intake History" FontSize="22" FontWeight="Bold" Foreground="#1A1A1A" />
+                        <TextBlock Text="{Binding FilteredLogs.Count, StringFormat='{}{0} records found'}" FontSize="13" Foreground="#888888" Margin="0,2,0,0" />
                     </StackPanel>
                 </Grid>
             </Border>
@@ -120,55 +120,193 @@
             <!-- Content Area -->
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="24">
                 <StackPanel>
-                    <!-- Filters -->
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
-                        <Button Content="All" Command="{Binding SetFilterCommand}" CommandParameter="All" Style="{StaticResource FilterButtonStyle}" Background="Transparent" Foreground="#888888" />
-                        <Button Content="Taken" Command="{Binding SetFilterCommand}" CommandParameter="Taken" Style="{StaticResource FilterButtonStyle}" Margin="8,0,0,0" />
-                        <Button Content="Skipped" Command="{Binding SetFilterCommand}" CommandParameter="Skipped" Style="{StaticResource FilterButtonStyle}" Margin="8,0,0,0" />
-                        <Button Content="Pending" Command="{Binding SetFilterCommand}" CommandParameter="Pending" Style="{StaticResource FilterButtonStyle}" Margin="8,0,0,0" />
-                    </StackPanel>
+                    <!-- Tab-style Filter Bar -->
+                    <Border Background="White" CornerRadius="12" Padding="8" Margin="0,0,0,16">
+                        <Border.Effect><DropShadowEffect ShadowDepth="0" BlurRadius="8" Opacity="0.05" Color="#000000" /></Border.Effect>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Command="{Binding SetFilterCommand}" CommandParameter="All" Padding="16,8" BorderThickness="0" Margin="2">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Background" Value="Transparent" />
+                                        <Setter Property="Foreground" Value="#888888" />
+                                        <Setter Property="FontSize" Value="13" />
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding DataContext.ActiveFilter, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="All">
+                                                <Setter Property="Background" Value="#104C7F" />
+                                                <Setter Property="Foreground" Value="White" />
+                                                <Setter Property="FontWeight" Value="SemiBold" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <TextBlock Text="All" />
+                            </Button>
+                            <Button Command="{Binding SetFilterCommand}" CommandParameter="Taken" Padding="16,8" BorderThickness="0" Margin="2">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Background" Value="Transparent" />
+                                        <Setter Property="Foreground" Value="#888888" />
+                                        <Setter Property="FontSize" Value="13" />
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding DataContext.ActiveFilter, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="Taken">
+                                                <Setter Property="Background" Value="#4CAF50" />
+                                                <Setter Property="Foreground" Value="White" />
+                                                <Setter Property="FontWeight" Value="SemiBold" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="7" Height="7" Fill="#4CAF50" VerticalAlignment="Center" Margin="0,0,6,0">
+                                        <Ellipse.Style>
+                                            <Style TargetType="Ellipse">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding DataContext.ActiveFilter, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="Taken">
+                                                        <Setter Property="Fill" Value="White" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
+                                    <TextBlock Text="Taken" />
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding SetFilterCommand}" CommandParameter="Missed" Padding="16,8" BorderThickness="0" Margin="2">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Background" Value="Transparent" />
+                                        <Setter Property="Foreground" Value="#888888" />
+                                        <Setter Property="FontSize" Value="13" />
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding DataContext.ActiveFilter, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="Missed">
+                                                <Setter Property="Background" Value="#D32F2F" />
+                                                <Setter Property="Foreground" Value="White" />
+                                                <Setter Property="FontWeight" Value="SemiBold" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="7" Height="7" Fill="#D32F2F" VerticalAlignment="Center" Margin="0,0,6,0">
+                                        <Ellipse.Style>
+                                            <Style TargetType="Ellipse">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding DataContext.ActiveFilter, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="Missed">
+                                                        <Setter Property="Fill" Value="White" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
+                                    <TextBlock Text="Missed" />
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding SetFilterCommand}" CommandParameter="Pending" Padding="16,8" BorderThickness="0" Margin="2">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Background" Value="Transparent" />
+                                        <Setter Property="Foreground" Value="#888888" />
+                                        <Setter Property="FontSize" Value="13" />
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding DataContext.ActiveFilter, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="Pending">
+                                                <Setter Property="Background" Value="#FF9800" />
+                                                <Setter Property="Foreground" Value="White" />
+                                                <Setter Property="FontWeight" Value="SemiBold" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="7" Height="7" Fill="#FF9800" VerticalAlignment="Center" Margin="0,0,6,0">
+                                        <Ellipse.Style>
+                                            <Style TargetType="Ellipse">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding DataContext.ActiveFilter, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="Pending">
+                                                        <Setter Property="Fill" Value="White" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
+                                    <TextBlock Text="Pending" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
 
-                    <!-- History Table -->
-                    <Border Background="White" CornerRadius="12" Padding="0">
+                    <!-- History Cards -->
+                    <Border Background="White" CornerRadius="12" Padding="0,8">
                         <Border.Effect><DropShadowEffect ShadowDepth="0" BlurRadius="12" Opacity="0.06" Color="#000000" /></Border.Effect>
                         <StackPanel>
-                            <!-- Header Row -->
-                            <Border Background="#F5F7FA" Padding="16,12">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="2.2*" />
-                                        <ColumnDefinition Width="1.5*" />
-                                        <ColumnDefinition Width="1.2*" />
-                                        <ColumnDefinition Width="1.2*" />
-                                        <ColumnDefinition Width="1.4*" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" Text="MEDICINE" FontSize="11" FontWeight="SemiBold" Foreground="#888888" />
-                                    <TextBlock Grid.Column="1" Text="SCHEDULED TIME" FontSize="11" FontWeight="SemiBold" Foreground="#888888" HorizontalAlignment="Center" />
-                                    <TextBlock Grid.Column="2" Text="STATUS" FontSize="11" FontWeight="SemiBold" Foreground="#888888" HorizontalAlignment="Center" />
-                                    <TextBlock Grid.Column="3" Text="LOGGED AT" FontSize="11" FontWeight="SemiBold" Foreground="#888888" HorizontalAlignment="Center" />
-                                    <TextBlock Grid.Column="4" Text="ACTION TIME" FontSize="11" FontWeight="SemiBold" Foreground="#888888" HorizontalAlignment="Center" />
-                                </Grid>
-                            </Border>
-
-                            <!-- Rows -->
                             <ItemsControl ItemsSource="{Binding FilteredLogs}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type core:IntakeLog}">
-                                        <Border BorderBrush="#F0F0F0" BorderThickness="0,0,0,1" Padding="16,12">
+                                        <Border BorderThickness="3,0,0,0" Margin="0,0,0,4" Padding="16,12">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="BorderBrush" Value="#FF9800" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Status}" Value="Taken">
+                                                            <Setter Property="BorderBrush" Value="#4CAF50" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="Missed">
+                                                            <Setter Property="BorderBrush" Value="#D32F2F" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="2.2*" />
+                                                    <ColumnDefinition Width="2*" />
                                                     <ColumnDefinition Width="1.5*" />
-                                                    <ColumnDefinition Width="1.2*" />
-                                                    <ColumnDefinition Width="1.2*" />
+                                                    <ColumnDefinition Width="Auto" />
                                                     <ColumnDefinition Width="1.4*" />
                                                 </Grid.ColumnDefinitions>
                                                 <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                    <TextBlock Text="{Binding Medication.DisplayName}" FontSize="14" FontWeight="SemiBold" Foreground="#1A1A1A" />
-                                                    <TextBlock Text="{Binding Medication.OfficialName}" FontSize="11" Foreground="#AAAAAA" />
+                                                    <TextBlock Text="{Binding Medication.OfficialName}" FontSize="14" FontWeight="SemiBold" Foreground="#1A1A1A" />
+                                                    <TextBlock Text="{Binding Medication.DisplayName}" FontSize="11" Foreground="#AAAAAA" Visibility="{Binding Medication.DisplayName, Converter={StaticResource StringToVisibilityConverter}}" />
                                                 </StackPanel>
-                                                <TextBlock Grid.Column="1" Text="{Binding ScheduledDateTime, StringFormat='{}{0:MMM dd, hh:mm tt}'}" FontSize="13" Foreground="#888888" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                                <Border Grid.Column="2" CornerRadius="12" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding ScheduledDateTime, StringFormat='{}{0:MMM dd}'}" FontSize="12" Foreground="#888888" />
+                                                    <TextBlock Text="{Binding ScheduledDateTime, StringFormat='{}{0:hh:mm tt}'}" FontSize="13" FontWeight="SemiBold" Foreground="#1A1A1A" />
+                                                </StackPanel>
+                                                <Border Grid.Column="2" CornerRadius="12" Padding="10,4" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,16,0">
                                                     <Border.Style>
                                                         <Style TargetType="Border">
                                                             <Setter Property="Background" Value="#FFF3E0" />
@@ -176,24 +314,24 @@
                                                                 <DataTrigger Binding="{Binding Status}" Value="Taken">
                                                                     <Setter Property="Background" Value="#E8F5E9" />
                                                                 </DataTrigger>
-                                                                <DataTrigger Binding="{Binding Status}" Value="Dismissed">
+                                                                <DataTrigger Binding="{Binding Status}" Value="Missed">
                                                                     <Setter Property="Background" Value="#FFEBEE" />
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
                                                     </Border.Style>
-                                                    <TextBlock FontSize="11" FontWeight="Bold" HorizontalAlignment="Center">
+                                                    <TextBlock FontSize="11" FontWeight="Bold">
                                                         <TextBlock.Style>
                                                             <Style TargetType="TextBlock">
-                                                                <Setter Property="Text" Value="Pending" />
+                                                                <Setter Property="Text" Value="⏳ Pending" />
                                                                 <Setter Property="Foreground" Value="#E65100" />
                                                                 <Style.Triggers>
                                                                     <DataTrigger Binding="{Binding Status}" Value="Taken">
-                                                                        <Setter Property="Text" Value="Taken" />
+                                                                        <Setter Property="Text" Value="✓ Taken" />
                                                                         <Setter Property="Foreground" Value="#2E7D32" />
                                                                     </DataTrigger>
-                                                                    <DataTrigger Binding="{Binding Status}" Value="Dismissed">
-                                                                        <Setter Property="Text" Value="Skipped" />
+                                                                    <DataTrigger Binding="{Binding Status}" Value="Missed">
+                                                                        <Setter Property="Text" Value="✗ Missed" />
                                                                         <Setter Property="Foreground" Value="#C62828" />
                                                                     </DataTrigger>
                                                                 </Style.Triggers>
@@ -201,28 +339,33 @@
                                                         </TextBlock.Style>
                                                     </TextBlock>
                                                 </Border>
-                                                <TextBlock Grid.Column="3" Text="{Binding LoggedAt, StringFormat='{}{0:MMM dd, hh:mm tt}'}" FontSize="12" Foreground="#888888" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                                <TextBlock Grid.Column="4" Text="{Binding ActionTimestamp, StringFormat='{}{0:MMM dd, hh:mm tt}'}" FontSize="12" Foreground="#888888" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                    <TextBlock.Style>
-                                                        <Style TargetType="TextBlock">
-                                                            <Setter Property="Text" Value="--" />
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding ActionTimestamp}" Value="{x:Null}">
-                                                                    <Setter Property="Text" Value="--" />
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </TextBlock.Style>
-                                                </TextBlock>
+                                                <StackPanel Grid.Column="3" VerticalAlignment="Center">
+                                                    <TextBlock Text="Actioned at" FontSize="11" Foreground="#AAAAAA" />
+                                                    <TextBlock FontSize="12" Foreground="#888888">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Text" Value="—" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding ActionTimestamp}" Value="{x:Null}">
+                                                                        <Setter Property="Text" Value="—" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                        <TextBlock.Text>
+                                                            <Binding Path="ActionTimestamp" StringFormat="{}{0:hh:mm tt}" FallbackValue="—" TargetNullValue="—" />
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                </StackPanel>
                                             </Grid>
                                         </Border>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
 
-                            <TextBlock Text="No history records found." FontSize="14" Foreground="#888888" HorizontalAlignment="Center" Margin="0,20">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
+                            <StackPanel HorizontalAlignment="Center" Margin="0,32,0,24">
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding FilteredLogs.Count}" Value="0">
@@ -230,8 +373,12 @@
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
+                                </StackPanel.Style>
+                                <Path Data="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18z"
+                                      Fill="#CCCCCC" Width="36" Height="36" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,0,0,12" />
+                                <TextBlock Text="No records found" FontSize="15" FontWeight="SemiBold" Foreground="#AAAAAA" HorizontalAlignment="Center" />
+                                <TextBlock Text="Try adjusting the filter above" FontSize="12" Foreground="#CCCCCC" HorizontalAlignment="Center" Margin="0,4,0,0" />
+                            </StackPanel>
                         </StackPanel>
                     </Border>
                 </StackPanel>

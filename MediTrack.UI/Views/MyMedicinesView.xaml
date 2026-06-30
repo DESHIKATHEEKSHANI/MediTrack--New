@@ -86,7 +86,7 @@
                     <DataTemplate DataType="{x:Type models:NavItem}">
                         <Border Style="{StaticResource NavItemStyle}">
                             <StackPanel Orientation="Horizontal">
-                                <Ellipse Width="8" Height="8" Fill="White" Margin="0,0,12,0" VerticalAlignment="Center" />
+                                <Path Data="{Binding Icon}" Fill="White" Width="16" Height="16" Stretch="Uniform" Margin="0,0,12,0" VerticalAlignment="Center" />
                                 <TextBlock Text="{Binding Label}" Foreground="White" FontSize="14" VerticalAlignment="Center" />
                             </StackPanel>
                         </Border>
@@ -124,7 +124,10 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="My Medicines" FontSize="22" FontWeight="Bold" Foreground="#1A1A1A" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Text="My Medicines" FontSize="22" FontWeight="Bold" Foreground="#1A1A1A" />
+                        <TextBlock Text="{Binding FilteredMedicines.Count, StringFormat='{}{0} medications found'}" FontSize="13" Foreground="#888888" Margin="0,2,0,0" />
+                    </StackPanel>
                     <Button Grid.Column="1" Content="+ Add Medicine" Command="{Binding ShowAddMedicineCommand}" Background="#104C7F" Foreground="White" Padding="14,10" FontWeight="SemiBold" BorderThickness="0">
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
@@ -209,7 +212,8 @@
                                                     </Border>
                                                     <StackPanel VerticalAlignment="Center">
                                                         <TextBlock Text="{Binding OfficialName}" FontSize="14" FontWeight="SemiBold" Foreground="#1A1A1A" />
-                                                        <Border>
+                                                        <TextBlock Text="{Binding DisplayName}" FontSize="11" Foreground="#888888" Visibility="{Binding DisplayName, Converter={StaticResource StringToVisibilityConverter}}" />
+                                                        <Border Margin="0,2,0,0">
                                                             <Border.Style>
                                                                 <Style TargetType="Border" BasedOn="{StaticResource StatusBadgeStyle}">
                                                                     <Setter Property="Background" Value="#E8F5E9" />
@@ -283,6 +287,23 @@
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
+
+                            <StackPanel HorizontalAlignment="Center" Margin="0,40,0,32">
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding FilteredMedicines.Count}" Value="0">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <Path Data="M6 3h12v18H6V3zm2 2v14h8V5H8zm3 3h2v2h-2V8zm0 4h2v2h-2v-2z"
+                                      Fill="#CCCCCC" Width="36" Height="36" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,0,0,12" />
+                                <TextBlock Text="No medications found" FontSize="15" FontWeight="SemiBold" Foreground="#AAAAAA" HorizontalAlignment="Center" />
+                                <TextBlock Text="Try changing the filter or add a new medication" FontSize="12" Foreground="#CCCCCC" HorizontalAlignment="Center" Margin="0,4,0,0" />
+                            </StackPanel>
                         </StackPanel>
                     </Border>
                 </StackPanel>
@@ -312,7 +333,8 @@
                                 <TextBlock Text="Basic Information" FontSize="13" FontWeight="SemiBold" Foreground="#104C7F" Margin="0,0,0,4" />
                             </Border>
                             <TextBlock Text="Medicine Name *" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
-                            <TextBox Text="{Binding SelectedMedicine.OfficialName}" Padding="10,8" Background="#F8F9FA" BorderBrush="#E0E0E0" Margin="0,0,0,12" />
+                            <TextBox Text="{Binding SelectedMedicine.OfficialName, UpdateSourceTrigger=PropertyChanged}" Padding="10,8" Background="#F8F9FA" BorderBrush="#E0E0E0" Margin="0,0,0,4" />
+                            <TextBlock Text="{Binding ValidationErrors[OfficialName]}" FontSize="11" Foreground="#D32F2F" Margin="0,0,0,8" Visibility="{Binding ValidationErrors[OfficialName], Converter={StaticResource StringToVisibilityConverter}}" />
 
                             <TextBlock Text="Display Name (optional)" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
                             <TextBox Text="{Binding SelectedMedicine.DisplayName}" Padding="10,8" Background="#F8F9FA" BorderBrush="#E0E0E0" Margin="0,0,0,12" />
@@ -320,59 +342,21 @@
                             <TextBlock Text="Medicine Type" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
                             <ComboBox ItemsSource="{Binding MedicineTypes}" SelectedItem="{Binding SelectedMedicine.MedicineType}" Padding="8,6" Background="#F8F9FA" BorderBrush="#E0E0E0" Margin="0,0,0,12" />
 
-                            <Grid Margin="0,0,0,12">
+                            <Grid Margin="0,0,0,4">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" Margin="0,0,8,0">
                                     <TextBlock Text="Dose Amount *" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
-                                    <TextBox Text="{Binding SelectedMedicine.DosageValue}" Padding="10,8" Background="#F8F9FA" BorderBrush="#E0E0E0" />
+                                    <TextBox Text="{Binding SelectedMedicine.DosageValue, UpdateSourceTrigger=PropertyChanged}" Padding="10,8" Background="#F8F9FA" BorderBrush="#E0E0E0" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" Margin="8,0,0,0">
                                     <TextBlock Text="Dose Unit" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
                                     <ComboBox ItemsSource="{Binding DosageUnits}" SelectedItem="{Binding SelectedMedicine.DosageUnit}" Padding="8,6" Background="#F8F9FA" BorderBrush="#E0E0E0" />
                                 </StackPanel>
                             </Grid>
-
-                            <!-- Section: Schedule -->
-                            <Border BorderBrush="#E3F2FD" BorderThickness="0,0,0,1" Margin="0,12,0,8">
-                                <TextBlock Text="Schedule" FontSize="13" FontWeight="SemiBold" Foreground="#104C7F" Margin="0,0,0,4" />
-                            </Border>
-                            <Grid Margin="0,0,0,12">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0" Margin="0,0,8,0">
-                                    <TextBlock Text="Frequency" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
-                                    <ComboBox ItemsSource="{Binding Frequencies}" SelectedItem="{Binding SelectedMedicine.Frequency}" Padding="8,6" Background="#F8F9FA" BorderBrush="#E0E0E0" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="1" Margin="8,0,0,0">
-                                    <TextBlock Text="Meal Timing" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
-                                    <ComboBox ItemsSource="{Binding MealTimings}" SelectedItem="{Binding SelectedMedicine.MealTiming}" Padding="8,6" Background="#F8F9FA" BorderBrush="#E0E0E0" />
-                                </StackPanel>
-                            </Grid>
-
-                            <TextBlock Text="Reminder Times (comma-separated, e.g. 08:00,20:00)" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
-                            <TextBox Text="{Binding SelectedMedicine.ReminderTimes}" Padding="10,8" Background="#F8F9FA" BorderBrush="#E0E0E0" Margin="0,0,0,12" />
-
-                            <Grid Margin="0,0,0,12">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0" Margin="0,0,8,0">
-                                    <TextBlock Text="Start Date *" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
-                                    <DatePicker SelectedDate="{Binding SelectedMedicine.StartDate}" Padding="8,6" Background="#F8F9FA" BorderBrush="#E0E0E0" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="1" Margin="8,0,0,0">
-                                    <TextBlock Text="End Date" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
-                                    <DatePicker SelectedDate="{Binding SelectedMedicine.EndDate}" Padding="8,6" Background="#F8F9FA" BorderBrush="#E0E0E0" />
-                                </StackPanel>
-                            </Grid>
-
-                            <CheckBox Content="Ongoing medication (no end date)" IsChecked="{Binding SelectedMedicine.IsOngoing}" Foreground="#555555" Margin="0,0,0,12" />
+                            <TextBlock Text="{Binding ValidationErrors[DosageValue]}" FontSize="11" Foreground="#D32F2F" Margin="0,0,0,8" Visibility="{Binding ValidationErrors[DosageValue], Converter={StaticResource StringToVisibilityConverter}}" />
 
                             <!-- Section: Stock & Notes -->
                             <Border BorderBrush="#E3F2FD" BorderThickness="0,0,0,1" Margin="0,12,0,8">

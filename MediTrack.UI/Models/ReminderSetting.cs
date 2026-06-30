@@ -9,4 +9,5 @@ public class ReminderSetting
     public string Time { get; set; } = "08:00";
     public string Frequency { get; set; } = "Daily";
     public int SnoozeMinutes { get; set; } = 10;
+    public string ActiveDays { get; set; } = "Every day";
 }

@@ -6,6 +6,8 @@ using MediTrack.UI.Models;
 using MediTrack.UI.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MediTrack.UI.ViewModels;
 
@@ -14,6 +16,7 @@ public partial class RemindersViewModel : ObservableObject
     private readonly IAuthService _authService;
     private readonly IMedicationService _medicationService;
     private readonly INavigationService _navigationService;
+    private readonly IReminderEngine _reminderEngine;
 
     [ObservableProperty]
     private ObservableCollection<ReminderSetting> _reminders = new();
@@ -35,6 +38,68 @@ public partial class RemindersViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _notificationsEnabled = true;
+
+    [ObservableProperty]
+    private ObservableCollection<ReminderTimeEntry> _reminderTimes = new();
+
+    [ObservableProperty]
+    private ObservableCollection<DayOfWeekCheckItem> _weekdays = new();
+
+    [ObservableProperty]
+    private DateTime? _selectedStartDate;
+
+    [ObservableProperty]
+    private DateTime? _selectedEndDate;
+
+    [ObservableProperty]
+    private bool _isOngoingReminder = true;
+
+    [ObservableProperty]
+    private int? _selectedMedicationId;
+
+    [ObservableProperty]
+    private bool _isReminderEnabled = true;
+
+    [ObservableProperty]
+    private int _selectedSnoozeMinutes = 10;
+
+    [ObservableProperty]
+    private Dictionary<string, string> _validationErrors = new();
+
+    [ObservableProperty]
+    private string _searchText = string.Empty;
+
+    [ObservableProperty]
+    private ObservableCollection<ReminderSetting> _filteredReminders = new();
+
+    partial void OnSearchTextChanged(string value)
+    {
+        FilterReminders();
+    }
+
+    private void FilterReminders()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText))
+        {
+            FilteredReminders = new ObservableCollection<ReminderSetting>(Reminders);
+            return;
+        }
+        var term = SearchText.Trim().ToLowerInvariant();
+        FilteredReminders = new ObservableCollection<ReminderSetting>(
+            Reminders.Where(r => (r.MedicationName?.ToLowerInvariant().Contains(term) ?? false) ||
+                                 (r.Time?.ToLowerInvariant().Contains(term) ?? false) ||
+                                 (r.Frequency?.ToLowerInvariant().Contains(term) ?? false)));
+    }
+
+    partial void OnNotificationsEnabledChanged(bool value)
+    {
+        if (value) _reminderEngine.Start();
+        else _reminderEngine.Stop();
+    }
+
+    public ObservableCollection<int> Hours { get; } = new(Enumerable.Range(1, 12));
+    public ObservableCollection<int> Minutes { get; } = new(Enumerable.Range(0, 60));
+    public ObservableCollection<string> AmPmOptions { get; } = new() { "AM", "PM" };
 
     public ObservableCollection<string> Frequencies { get; } = new()
     { "Daily", "Twice daily", "Three times daily", "Weekly", "Custom" };
@@ -93,11 +158,13 @@ public partial class RemindersViewModel : ObservableObject
     public RemindersViewModel(
         IAuthService authService,
         IMedicationService medicationService,
-        INavigationService navigationService)
+        INavigationService navigationService,
+        IReminderEngine reminderEngine)
     {
         _authService = authService;
         _medicationService = medicationService;
         _navigationService = navigationService;
+        _reminderEngine = reminderEngine;
 
         SelectedNavItem = NavItems.First(n => n.Label == "Reminders");
 
@@ -108,7 +175,63 @@ public partial class RemindersViewModel : ObservableObject
             WelcomeMessage = $"{greeting}, {_authService.CurrentUser.FullName}";
         }
 
+        _navigationService.Navigated += (_, _) =>
+        {
+            if (_navigationService.CurrentViewModel != this) return;
+            _notificationsEnabled = _reminderEngine.IsRunning;
+            OnPropertyChanged(nameof(NotificationsEnabled));
+            _ = LoadRemindersAsync();
+        };
+
         _ = LoadRemindersAsync();
+    }
+
+    private static ObservableCollection<DayOfWeekCheckItem> InitWeekdays(IEnumerable<DayOfWeek> selected)
+    {
+        var selectedSet = new HashSet<DayOfWeek>(selected);
+        var order = new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday };
+        var labels = new Dictionary<DayOfWeek, string>
+        {
+            { DayOfWeek.Monday, "Mon" }, { DayOfWeek.Tuesday, "Tue" }, { DayOfWeek.Wednesday, "Wed" },
+            { DayOfWeek.Thursday, "Thu" }, { DayOfWeek.Friday, "Fri" }, { DayOfWeek.Saturday, "Sat" },
+            { DayOfWeek.Sunday, "Sun" }
+        };
+        return new ObservableCollection<DayOfWeekCheckItem>(
+            order.Select(d => new DayOfWeekCheckItem { Day = d, ShortLabel = labels[d], IsSelected = selectedSet.Contains(d) }));
+    }
+
+    private static string BuildMedicationName(Medication med)
+    {
+        if (!string.IsNullOrWhiteSpace(med.DisplayName) && !string.Equals(med.DisplayName, med.OfficialName, StringComparison.OrdinalIgnoreCase))
+            return $"{med.OfficialName} ({med.DisplayName})";
+        return med.OfficialName;
+    }
+
+    // DayOfWeek: 0=Sunday, 1=Monday … 6=Saturday (matches DB JSON values)
+    private static readonly DayOfWeek[] _dayOrder =
+        { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday };
+
+    private static readonly Dictionary<DayOfWeek, string> _dayAbbr = new()
+    {
+        { DayOfWeek.Monday, "Mon" }, { DayOfWeek.Tuesday, "Tue" }, { DayOfWeek.Wednesday, "Wed" },
+        { DayOfWeek.Thursday, "Thu" }, { DayOfWeek.Friday, "Fri" }, { DayOfWeek.Saturday, "Sat" },
+        { DayOfWeek.Sunday, "Sun" }
+    };
+
+    private static string FormatActiveDays(DayOfWeek[]? days)
+    {
+        if (days == null || days.Length == 0) return "No days set";
+        if (days.Length == 7) return "Every day";
+
+        var set = new HashSet<DayOfWeek>(days);
+        // Check Mon–Fri only
+        if (set.SetEquals(new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday }))
+            return "Weekdays";
+        // Check Sat–Sun only
+        if (set.SetEquals(new[] { DayOfWeek.Saturday, DayOfWeek.Sunday }))
+            return "Weekends";
+
+        return string.Join(", ", _dayOrder.Where(set.Contains).Select(d => _dayAbbr[d]));
     }
 
     private async Task LoadRemindersAsync()
@@ -124,13 +247,16 @@ public partial class RemindersViewModel : ObservableObject
             var times = med.ReminderTimes.Split(',', StringSplitOptions.RemoveEmptyEntries);
             foreach (var time in times)
             {
+                var fullName = BuildMedicationName(med);
                 reminderList.Add(new ReminderSetting
                 {
                     Id = id++,
                     MedicationId = med.Id,
-                    MedicationName = med.DisplayName ?? med.OfficialName,
+                    MedicationName = fullName,
                     Time = time.Trim(),
                     Frequency = med.Frequency ?? "Daily",
+                    SnoozeMinutes = med.SnoozeMinutes ?? 10,
+                    ActiveDays = FormatActiveDays(med.WeekdaySchedule),
                     IsEnabled = true
                 });
             }
@@ -140,19 +266,25 @@ public partial class RemindersViewModel : ObservableObject
         {
             Medications = new ObservableCollection<Medication>(meds.Where(m => !m.IsArchived));
             Reminders = new ObservableCollection<ReminderSetting>(reminderList);
+            FilterReminders();
         });
     }
 
     [RelayCommand]
     private void ShowAddReminder()
     {
-        SelectedReminder = new ReminderSetting
+        SelectedMedicationId = null;
+        ReminderTimes = new ObservableCollection<ReminderTimeEntry>
         {
-            IsEnabled = true,
-            Time = "08:00",
-            Frequency = "Daily",
-            SnoozeMinutes = 10
+            new ReminderTimeEntry { Hour = 8, Minute = 0, AmPm = "AM" }
         };
+        Weekdays = InitWeekdays(Enum.GetValues<DayOfWeek>());
+        SelectedStartDate = DateTime.Today;
+        SelectedEndDate = null;
+        IsOngoingReminder = true;
+        IsReminderEnabled = true;
+        SelectedSnoozeMinutes = 10;
+        ValidationErrors = new Dictionary<string, string>();
         IsEditing = false;
         IsPopupOpen = true;
     }
@@ -160,16 +292,32 @@ public partial class RemindersViewModel : ObservableObject
     [RelayCommand]
     private void ShowEditReminder(ReminderSetting reminder)
     {
-        SelectedReminder = new ReminderSetting
+        SelectedMedicationId = reminder.MedicationId;
+        IsReminderEnabled = reminder.IsEnabled;
+        SelectedSnoozeMinutes = reminder.SnoozeMinutes;
+
+        var times = new ObservableCollection<ReminderTimeEntry>();
+        if (!string.IsNullOrWhiteSpace(reminder.Time))
         {
-            Id = reminder.Id,
-            MedicationId = reminder.MedicationId,
-            MedicationName = reminder.MedicationName,
-            IsEnabled = reminder.IsEnabled,
-            Time = reminder.Time,
-            Frequency = reminder.Frequency,
-            SnoozeMinutes = reminder.SnoozeMinutes
-        };
+            foreach (var part in reminder.Time.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                times.Add(ReminderTimeEntry.From24HourString(part.Trim()));
+        }
+        if (times.Count == 0)
+            times.Add(new ReminderTimeEntry { Hour = 8, Minute = 0, AmPm = "AM" });
+
+        // Pre-fill weekdays/dates from the medication's existing schedule
+        var med = Medications.FirstOrDefault(m => m.Id == reminder.MedicationId);
+        var activeDays = med?.WeekdaySchedule?.Any() == true
+            ? (IEnumerable<DayOfWeek>)med.WeekdaySchedule
+            : Enum.GetValues<DayOfWeek>();
+        Weekdays = InitWeekdays(activeDays);
+        SelectedStartDate = med?.StartDate ?? DateTime.Today;
+        SelectedEndDate = med?.EndDate;
+        IsOngoingReminder = med?.IsOngoing ?? true;
+
+        ReminderTimes = times;
+        SelectedReminder = reminder;
+        ValidationErrors = new Dictionary<string, string>();
         IsEditing = true;
         IsPopupOpen = true;
     }
@@ -181,21 +329,58 @@ public partial class RemindersViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void AddTime()
+    {
+        ReminderTimes.Add(new ReminderTimeEntry { Hour = 8, Minute = 0, AmPm = "AM" });
+    }
+
+    [RelayCommand]
+    private void RemoveTime(ReminderTimeEntry entry)
+    {
+        if (ReminderTimes.Count > 1 && entry != null)
+            ReminderTimes.Remove(entry);
+    }
+
+    private bool ValidateReminder()
+    {
+        var errors = new Dictionary<string, string>();
+
+        if (SelectedMedicationId == null)
+            errors["Medication"] = "Please select a medicine.";
+
+        if (ReminderTimes == null || ReminderTimes.Count == 0)
+            errors["Times"] = "At least one reminder time is required.";
+
+        if (Weekdays == null || !Weekdays.Any(w => w.IsSelected))
+            errors["Weekdays"] = "Please select at least one day.";
+
+        ValidationErrors = errors;
+        return errors.Count == 0;
+    }
+
+    [RelayCommand]
     private async Task SaveReminderAsync()
     {
         if (_authService.CurrentUser == null) return;
-        if (SelectedReminder.MedicationId == null)
-        {
-            // If adding new, need to select a medication first
-            IsPopupOpen = false;
-            return;
-        }
+        if (!ValidateReminder()) return;
 
-        var med = await _medicationService.GetByIdAsync(SelectedReminder.MedicationId.Value);
+        var med = await _medicationService.GetByIdAsync(SelectedMedicationId!.Value);
         if (med == null) return;
 
-        med.ReminderTimes = SelectedReminder.Time;
-        med.Frequency = SelectedReminder.Frequency;
+        var timeStrings = ReminderTimes.Select(t => t.To24HourString()).ToList();
+        med.ReminderTimes = string.Join(",", timeStrings);
+        if (TimeSpan.TryParse(timeStrings.First(), out var ts))
+            med.ScheduledTime = ts;
+        med.Frequency = ReminderTimes.Count == 1 ? "Daily" : ReminderTimes.Count == 2 ? "Twice daily" : ReminderTimes.Count == 3 ? "Three times daily" : "Custom";
+        med.SnoozeMinutes = SelectedSnoozeMinutes;
+
+        // Persist schedule metadata
+        med.WeekdaySchedule = Weekdays.Where(w => w.IsSelected).Select(w => w.Day).ToArray();
+        if (!med.WeekdaySchedule.Any()) med.WeekdaySchedule = Enum.GetValues<DayOfWeek>();
+        med.StartDate = SelectedStartDate;
+        med.IsOngoing = IsOngoingReminder;
+        med.EndDate = IsOngoingReminder ? null : SelectedEndDate;
+
         await _medicationService.UpdateAsync(med);
 
         IsPopupOpen = false;

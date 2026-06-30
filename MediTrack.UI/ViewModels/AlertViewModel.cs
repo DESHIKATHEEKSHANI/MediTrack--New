@@ -18,19 +18,34 @@ public partial class AlertViewModel : ObservableObject
     [ObservableProperty]
     private string _dosageInfo = string.Empty;
 
+    [ObservableProperty]
+    private int _snoozeMinutes = 10;
+
     public int UserId { get; set; }
     public int MedicationId { get; set; }
     public DateTime ScheduledTime { get; set; }
+    public Action? OnSnooze { get; set; }
+
+    // Parameterless constructor required for WPF type scanning
+    public AlertViewModel() { _intakeLogService = null!; }
 
     public AlertViewModel(IIntakeLogService intakeLogService, Medication medication, DateTime scheduledTime, Action? closeAction = null)
     {
         _intakeLogService = intakeLogService;
         _closeAction = closeAction;
-        MedicationName = medication.DisplayName ?? medication.OfficialName;
+        MedicationName = BuildMedicationName(medication);
         DosageInfo = $"{medication.DosageValue} {medication.DosageUnit}";
+        SnoozeMinutes = medication.SnoozeMinutes ?? 10;
         UserId = medication.UserId;
         MedicationId = medication.Id;
         ScheduledTime = scheduledTime;
+    }
+
+    private static string BuildMedicationName(Medication med)
+    {
+        if (!string.IsNullOrWhiteSpace(med.DisplayName) && !string.Equals(med.DisplayName, med.OfficialName, StringComparison.OrdinalIgnoreCase))
+            return $"{med.OfficialName} ({med.DisplayName})";
+        return med.OfficialName;
     }
 
     [RelayCommand]
@@ -41,9 +56,16 @@ public partial class AlertViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task DismissAsync()
+    private async Task MissedAsync()
     {
-        await _intakeLogService.LogActionAsync(UserId, MedicationId, ScheduledTime, IntakeStatus.Dismissed);
+        await _intakeLogService.LogActionAsync(UserId, MedicationId, ScheduledTime, IntakeStatus.Missed);
+        _closeAction?.Invoke();
+    }
+
+    [RelayCommand]
+    private void Snooze()
+    {
+        OnSnooze?.Invoke();
         _closeAction?.Invoke();
     }
 }

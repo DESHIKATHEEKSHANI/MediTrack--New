@@ -70,6 +70,12 @@ public partial class HistoryViewModel : ObservableObject
             WelcomeMessage = $"{greeting}, {_authService.CurrentUser.FullName}";
         }
 
+        _navigationService.Navigated += (_, _) =>
+        {
+            if (_navigationService.CurrentViewModel == this)
+                _ = LoadLogsAsync();
+        };
+
         _ = LoadLogsAsync();
     }
 
@@ -80,7 +86,7 @@ public partial class HistoryViewModel : ObservableObject
         var logs = await _intakeLogService.GetUserLogsAsync(_authService.CurrentUser.Id);
         System.Windows.Application.Current?.Dispatcher.Invoke(() =>
         {
-            Logs = new ObservableCollection<IntakeLog>(logs.OrderByDescending(l => l.ScheduledDateTime));
+            Logs = new ObservableCollection<IntakeLog>(logs.OrderByDescending(l => l.Reminder?.ScheduledDateTime ?? l.LoggedAt));
             ApplyFilter();
         });
     }
@@ -90,8 +96,8 @@ public partial class HistoryViewModel : ObservableObject
         var query = Logs.AsEnumerable();
         if (ActiveFilter == "Taken")
             query = query.Where(l => l.Status == IntakeStatus.Taken);
-        else if (ActiveFilter == "Skipped")
-            query = query.Where(l => l.Status == IntakeStatus.Dismissed);
+        else if (ActiveFilter == "Missed")
+            query = query.Where(l => l.Status == IntakeStatus.Missed);
         else if (ActiveFilter == "Pending")
             query = query.Where(l => l.Status == IntakeStatus.Pending);
 

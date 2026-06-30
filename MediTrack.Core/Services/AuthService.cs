@@ -56,4 +56,37 @@ public class AuthService : IAuthService
         AuthStateChanged?.Invoke(this, EventArgs.Empty);
         return Task.CompletedTask;
     }
+
+    public async Task<bool> UpdateProfileAsync(int userId, string fullName, string email)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null) return false;
+
+        if (await _context.Users.AnyAsync(u => u.Email == email && u.Id != userId))
+            return false;
+
+        user.FullName = fullName;
+        user.Email = email;
+        await _context.SaveChangesAsync();
+
+        if (CurrentUser?.Id == userId)
+        {
+            CurrentUser.FullName = fullName;
+            CurrentUser.Email = email;
+        }
+        return true;
+    }
+
+    public async Task<bool> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null) return false;
+
+        if (!BCrypt.Net.BCrypt.Verify(currentPassword, user.PasswordHash))
+            return false;
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+        await _context.SaveChangesAsync();
+        return true;
+    }
 }

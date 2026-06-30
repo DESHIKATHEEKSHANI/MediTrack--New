@@ -80,6 +80,14 @@ namespace MediTrack.Core.Migrations
                     b.Property<double>("DosageValue")
                         .HasColumnType("double");
 
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Frequency")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
                     b.Property<string>("IntakeInstructions")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -88,13 +96,46 @@ namespace MediTrack.Core.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsOngoing")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int?>("LowStockAlertAt")
+                        .HasColumnType("int");
+
+                    b.Property<string>("MealTiming")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
+                    b.Property<string>("MedicineType")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
                     b.Property<string>("OfficialName")
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("varchar(150)");
 
+                    b.Property<int?>("RemainingPills")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReminderTimes")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
                     b.Property<TimeSpan>("ScheduledTime")
                         .HasColumnType("time(6)");
+
+                    b.Property<int?>("SnoozeMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)");

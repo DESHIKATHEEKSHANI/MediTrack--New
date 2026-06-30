@@ -71,7 +71,7 @@
                     <DataTemplate DataType="{x:Type models:NavItem}">
                         <Border Style="{StaticResource NavItemStyle}">
                             <StackPanel Orientation="Horizontal">
-                                <Ellipse Width="8" Height="8" Fill="White" Margin="0,0,12,0" VerticalAlignment="Center" />
+                                <Path Data="{Binding Icon}" Fill="White" Width="16" Height="16" Stretch="Uniform" Margin="0,0,12,0" VerticalAlignment="Center" />
                                 <TextBlock Text="{Binding Label}" Foreground="White" FontSize="14" VerticalAlignment="Center" />
                             </StackPanel>
                         </Border>
@@ -185,7 +185,7 @@
                             <StackPanel>
                                 <TextBlock Text="Next Medication" FontSize="12" Foreground="#888888" />
                                 <TextBlock Text="{Binding NextMedication.ScheduledTime, StringFormat='{}{0:hh\\:mm tt}'}" FontSize="32" FontWeight="Bold" Foreground="#104C7F" Margin="0,8,0,0" />
-                                <TextBlock Text="{Binding NextMedication.DisplayName}" FontSize="14" Foreground="#1A1A1A" Margin="0,2,0,0" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Text="{Binding NextMedication.MedicationName}" FontSize="14" Foreground="#1A1A1A" Margin="0,2,0,0" TextTrimming="CharacterEllipsis" />
                                 <TextBlock Text="{Binding NextMedication.Dosage}" FontSize="12" Foreground="#888888" Margin="0,2,0,0" />
                                 <TextBlock Text="No upcoming doses" FontSize="14" Foreground="#888888" Margin="0,8,0,0">
                                     <TextBlock.Style>
@@ -217,7 +217,7 @@
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal">
                                     <Ellipse Width="10" Height="10" Fill="#D32F2F" Margin="0,0,8,0" VerticalAlignment="Center" />
-                                    <TextBlock Text="Skipped" FontSize="13" Foreground="#1A1A1A" />
+                                    <TextBlock Text="Missed" FontSize="13" Foreground="#1A1A1A" />
                                 </StackPanel>
                             </StackPanel>
                         </Border>
@@ -239,32 +239,56 @@
                             <ItemsControl ItemsSource="{Binding ScheduleItems}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type models:ScheduleItem}">
-                                        <Border Background="#F8F9FA" CornerRadius="8" Padding="16" Margin="0,0,0,10">
+                                        <Border CornerRadius="8" Padding="16" Margin="0,0,0,10" BorderThickness="4,0,0,0">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Background" Value="#FFF8E1" />
+                                                    <Setter Property="BorderBrush" Value="#FF9800" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsMissed}" Value="True">
+                                                            <Setter Property="Background" Value="#FFEBEE" />
+                                                            <Setter Property="BorderBrush" Value="#D32F2F" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="Taken">
+                                                            <Setter Property="Background" Value="#E8F5E9" />
+                                                            <Setter Property="BorderBrush" Value="#4CAF50" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="Missed">
+                                                            <Setter Property="Background" Value="#FAFAFA" />
+                                                            <Setter Property="BorderBrush" Value="#BDBDBD" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="90" />
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
 
-                                                <StackPanel Grid.Column="0" Width="80" VerticalAlignment="Center">
-                                                    <TextBlock Text="{Binding ScheduledTime, StringFormat='{}{0:hh\\:mm tt}'}" FontSize="18" FontWeight="Bold" Foreground="#104C7F" />
+                                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding ScheduledTime, StringFormat='{}{0:hh\\:mm}'}" FontSize="20" FontWeight="Bold" Foreground="#104C7F" />
+                                                    <TextBlock Text="{Binding ScheduledTime, StringFormat='{}{0:tt}'}" FontSize="12" Foreground="#888888" />
                                                 </StackPanel>
 
                                                 <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0">
-                                                    <TextBlock Text="{Binding DisplayName}" FontSize="15" FontWeight="SemiBold" Foreground="#1A1A1A" />
+                                                    <TextBlock Text="{Binding MedicationName}" FontSize="14" FontWeight="SemiBold" Foreground="#1A1A1A" />
                                                     <TextBlock Text="{Binding Dosage}" FontSize="12" Foreground="#888888" Margin="0,2,0,0" />
-                                                    <Border Margin="0,4,0,0">
+                                                    <Border CornerRadius="4" Padding="7,2" Margin="0,5,0,0" HorizontalAlignment="Left">
                                                         <Border.Style>
-                                                            <Style TargetType="Border" BasedOn="{StaticResource StatusBadge}">
+                                                            <Style TargetType="Border">
                                                                 <Setter Property="Background" Value="#FFF3E0" />
                                                                 <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding Status}" Value="Taken">
-                                                                        <Setter Property="Background" Value="#E8F5E9" />
+                                                                    <DataTrigger Binding="{Binding IsMissed}" Value="True">
+                                                                        <Setter Property="Background" Value="#FFCDD2" />
                                                                     </DataTrigger>
-                                                                    <DataTrigger Binding="{Binding Status}" Value="Dismissed">
-                                                                        <Setter Property="Background" Value="#FFEBEE" />
+                                                                    <DataTrigger Binding="{Binding Status}" Value="Taken">
+                                                                        <Setter Property="Background" Value="#C8E6C9" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding Status}" Value="Missed">
+                                                                        <Setter Property="Background" Value="#EEEEEE" />
                                                                     </DataTrigger>
                                                                 </Style.Triggers>
                                                             </Style>
@@ -272,16 +296,20 @@
                                                         <TextBlock FontSize="11" FontWeight="Bold">
                                                             <TextBlock.Style>
                                                                 <Style TargetType="TextBlock">
-                                                                    <Setter Property="Text" Value="Pending" />
+                                                                    <Setter Property="Text" Value="⏳ Pending" />
                                                                     <Setter Property="Foreground" Value="#E65100" />
                                                                     <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding IsMissed}" Value="True">
+                                                                            <Setter Property="Text" Value="⚠ Missed" />
+                                                                            <Setter Property="Foreground" Value="#B71C1C" />
+                                                                        </DataTrigger>
                                                                         <DataTrigger Binding="{Binding Status}" Value="Taken">
-                                                                            <Setter Property="Text" Value="Taken" />
+                                                                            <Setter Property="Text" Value="✓ Taken" />
                                                                             <Setter Property="Foreground" Value="#2E7D32" />
                                                                         </DataTrigger>
-                                                                        <DataTrigger Binding="{Binding Status}" Value="Dismissed">
-                                                                            <Setter Property="Text" Value="Skipped" />
-                                                                            <Setter Property="Foreground" Value="#C62828" />
+                                                                        <DataTrigger Binding="{Binding Status}" Value="Missed">
+                                                                            <Setter Property="Text" Value="✗ Missed" />
+                                                                            <Setter Property="Foreground" Value="#757575" />
                                                                         </DataTrigger>
                                                                     </Style.Triggers>
                                                                 </Style>
@@ -290,12 +318,27 @@
                                                     </Border>
                                                 </StackPanel>
 
-                                                <Button Grid.Column="2" Content="Mark Taken" Command="{Binding DataContext.MarkTakenCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#4CAF50" Foreground="White" Padding="12,6" Margin="0,0,8,0" BorderThickness="0" FontSize="12" FontWeight="SemiBold">
+                                                <Button Grid.Column="2" Content="✓ Taken"
+                                                        Command="{Binding DataContext.MarkTakenCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        Background="#4CAF50" Foreground="White" Padding="12,7" Margin="0,0,8,0" BorderThickness="0" FontSize="12" FontWeight="SemiBold">
                                                     <Button.Style>
-                                                        <Style TargetType="Button" BasedOn="{StaticResource DateNavButton}">
+                                                        <Style TargetType="Button">
                                                             <Setter Property="Visibility" Value="Visible" />
+                                                            <Setter Property="Template">
+                                                                <Setter.Value>
+                                                                    <ControlTemplate TargetType="Button">
+                                                                        <Border Background="{TemplateBinding Background}" CornerRadius="7" Padding="{TemplateBinding Padding}">
+                                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                                        </Border>
+                                                                    </ControlTemplate>
+                                                                </Setter.Value>
+                                                            </Setter>
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding Status}" Value="Taken">
+                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Status}" Value="Missed">
                                                                     <Setter Property="Visibility" Value="Collapsed" />
                                                                 </DataTrigger>
                                                             </Style.Triggers>
@@ -303,15 +346,30 @@
                                                     </Button.Style>
                                                 </Button>
 
-                                                <Button Grid.Column="3" Content="Skip" Command="{Binding DataContext.MarkSkippedCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#FFEBEE" Foreground="#D32F2F" Padding="12,6" BorderThickness="0" FontSize="12" FontWeight="SemiBold">
+                                                <Button Grid.Column="3" Content="✗ Missed"
+                                                        Command="{Binding DataContext.MarkMissedCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        Background="#FFEBEE" Foreground="#D32F2F" Padding="12,7" BorderThickness="0" FontSize="12" FontWeight="SemiBold">
                                                     <Button.Style>
-                                                        <Style TargetType="Button" BasedOn="{StaticResource DateNavButton}">
+                                                        <Style TargetType="Button">
                                                             <Setter Property="Visibility" Value="Visible" />
+                                                            <Setter Property="Template">
+                                                                <Setter.Value>
+                                                                    <ControlTemplate TargetType="Button">
+                                                                        <Border Background="{TemplateBinding Background}" CornerRadius="7" Padding="{TemplateBinding Padding}">
+                                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                                        </Border>
+                                                                    </ControlTemplate>
+                                                                </Setter.Value>
+                                                            </Setter>
                                                             <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsMissed}" Value="True">
+                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                </DataTrigger>
                                                                 <DataTrigger Binding="{Binding Status}" Value="Taken">
                                                                     <Setter Property="Visibility" Value="Collapsed" />
                                                                 </DataTrigger>
-                                                                <DataTrigger Binding="{Binding Status}" Value="Dismissed">
+                                                                <DataTrigger Binding="{Binding Status}" Value="Missed">
                                                                     <Setter Property="Visibility" Value="Collapsed" />
                                                                 </DataTrigger>
                                                             </Style.Triggers>

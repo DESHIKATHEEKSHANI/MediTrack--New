@@ -43,4 +43,9 @@ public partial class LoginView : System.Windows.Controls.UserControl
         if (DataContext is LoginViewModel vm)
             vm.ConfirmPassword = ConfirmPasswordBox.Password;
     }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
 }

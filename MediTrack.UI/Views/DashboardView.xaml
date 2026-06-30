@@ -48,7 +48,7 @@
                     <DataTemplate DataType="{x:Type models:NavItem}">
                         <Border Style="{StaticResource NavItemStyle}">
                             <StackPanel Orientation="Horizontal">
-                                <Ellipse Width="8" Height="8" Fill="White" Margin="0,0,12,0" VerticalAlignment="Center" />
+                                <Path Data="{Binding Icon}" Fill="White" Width="16" Height="16" Stretch="Uniform" Margin="0,0,12,0" VerticalAlignment="Center" />
                                 <TextBlock Text="{Binding Label}" Foreground="White" FontSize="14" VerticalAlignment="Center" />
                             </StackPanel>
                         </Border>
@@ -112,6 +112,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
@@ -157,8 +158,40 @@
                         </Border>
                     </Grid>
 
+                    <!-- Low Stock Alerts -->
+                    <Border Grid.Row="1" Background="#FFF3E0" CornerRadius="12" Padding="16" Margin="0,0,0,20" Visibility="{Binding HasLowStockAlerts, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Border.Effect><DropShadowEffect ShadowDepth="0" BlurRadius="12" Opacity="0.06" Color="#000000" /></Border.Effect>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0" Width="36" Height="36" CornerRadius="18" Background="#FF9800" Margin="0,0,12,0" VerticalAlignment="Center">
+                                <TextBlock Text="!" FontSize="20" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="Low Stock Alert" FontSize="14" FontWeight="SemiBold" Foreground="#E65100" />
+                                <ItemsControl ItemsSource="{Binding LowStockMedications}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock FontSize="12" Foreground="#555555" Margin="0,2,0,0">
+                                                <TextBlock.Text>
+                                                    <MultiBinding StringFormat="{}{0} — {1} pill(s) remaining (alert at {2})">
+                                                        <Binding Path="OfficialName" />
+                                                        <Binding Path="RemainingPills" />
+                                                        <Binding Path="LowStockAlertAt" />
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
                     <!-- Row 2 -->
-                    <Grid Grid.Row="1" Margin="0,0,0,20">
+                    <Grid Grid.Row="2" Margin="0,0,0,20">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="2.2*" />
                             <ColumnDefinition Width="1.2*" />
@@ -192,7 +225,7 @@
                                                                 <Setter Property="Background" Value="#E8F5E9" />
                                                                 <Setter Property="BorderBrush" Value="#4CAF50" />
                                                             </DataTrigger>
-                                                            <DataTrigger Binding="{Binding Status}" Value="Dismissed">
+                                                            <DataTrigger Binding="{Binding Status}" Value="Missed">
                                                                 <Setter Property="Background" Value="#FAFAFA" />
                                                                 <Setter Property="BorderBrush" Value="#BDBDBD" />
                                                             </DataTrigger>
@@ -216,7 +249,7 @@
                                                                             <DataTrigger Binding="{Binding Status}" Value="Taken">
                                                                                 <Setter Property="Background" Value="#E8F5E9" />
                                                                             </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Status}" Value="Dismissed">
+                                                                            <DataTrigger Binding="{Binding Status}" Value="Missed">
                                                                                 <Setter Property="Background" Value="#F5F5F5" />
                                                                             </DataTrigger>
                                                                         </Style.Triggers>
@@ -232,8 +265,8 @@
                                                                                     <Setter Property="Text" Value="✓ Taken" />
                                                                                     <Setter Property="Foreground" Value="#2E7D32" />
                                                                                 </DataTrigger>
-                                                                                <DataTrigger Binding="{Binding Status}" Value="Dismissed">
-                                                                                    <Setter Property="Text" Value="✗ Skipped" />
+                                                                                <DataTrigger Binding="{Binding Status}" Value="Missed">
+                                                                                    <Setter Property="Text" Value="✗ Missed" />
                                                                                     <Setter Property="Foreground" Value="#757575" />
                                                                                 </DataTrigger>
                                                                             </Style.Triggers>
@@ -267,8 +300,8 @@
                                                                 </ControlTemplate>
                                                             </Button.Template>
                                                         </Button>
-                                                        <Button Content="Skip"
-                                                                Command="{Binding DataContext.MarkDismissedCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        <Button Content="Missed"
+                                                                Command="{Binding DataContext.MarkMissedCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                 CommandParameter="{Binding}"
                                                                 Background="#FF9800" Foreground="White" Padding="10,5" BorderThickness="0" FontSize="12">
                                                             <Button.Style>
@@ -387,7 +420,7 @@
                                                                     <DataTrigger Binding="{Binding Status}" Value="Taken">
                                                                         <Setter Property="Fill" Value="#4CAF50" />
                                                                     </DataTrigger>
-                                                                    <DataTrigger Binding="{Binding Status}" Value="Dismissed">
+                                                                    <DataTrigger Binding="{Binding Status}" Value="Missed">
                                                                         <Setter Property="Fill" Value="#D32F2F" />
                                                                     </DataTrigger>
                                                                 </Style.Triggers>
@@ -399,7 +432,7 @@
                                                         <TextBlock FontSize="11" Foreground="#888888">
                                                             <TextBlock.Style>
                                                                 <Style TargetType="TextBlock">
-                                                                    <Setter Property="Text" Value="Skipped" />
+                                                                    <Setter Property="Text" Value="Missed" />
                                                                     <Style.Triggers>
                                                                         <DataTrigger Binding="{Binding Status}" Value="Taken">
                                                                             <Setter Property="Text" Value="Taken" />
@@ -420,7 +453,7 @@
                     </Grid>
 
                     <!-- My Medications Table -->
-                    <Border Grid.Row="2" Background="White" CornerRadius="12" Padding="20" Margin="0,0,0,20">
+                    <Border Grid.Row="3" Background="White" CornerRadius="12" Padding="20" Margin="0,0,0,20">
                         <Border.Effect><DropShadowEffect ShadowDepth="0" BlurRadius="12" Opacity="0.06" Color="#000000" /></Border.Effect>
                         <StackPanel>
                             <Grid Margin="0,0,0,12">

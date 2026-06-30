@@ -23,13 +23,49 @@ public partial class SettingsViewModel : ObservableObject
     private string _userEmail = string.Empty;
 
     [ObservableProperty]
+    private string _userName = string.Empty;
+
+    [ObservableProperty]
+    private string _userInitial = "?";
+
+    [ObservableProperty]
     private string _appVersion = "1.0.0";
 
     [ObservableProperty]
     private bool _soundEnabled = true;
 
     [ObservableProperty]
-    private bool _darkMode = false;
+    private bool _isEditingProfile;
+
+    [ObservableProperty]
+    private string _editFullName = string.Empty;
+
+    [ObservableProperty]
+    private string _editEmail = string.Empty;
+
+    [ObservableProperty]
+    private string _profileErrorMessage = string.Empty;
+
+    [ObservableProperty]
+    private string _profileSuccessMessage = string.Empty;
+
+    [ObservableProperty]
+    private bool _isChangingPassword;
+
+    [ObservableProperty]
+    private string _currentPassword = string.Empty;
+
+    [ObservableProperty]
+    private string _newPassword = string.Empty;
+
+    [ObservableProperty]
+    private string _confirmNewPassword = string.Empty;
+
+    [ObservableProperty]
+    private string _passwordErrorMessage = string.Empty;
+
+    [ObservableProperty]
+    private string _passwordSuccessMessage = string.Empty;
 
     [ObservableProperty]
     private ObservableCollection<NavItem> _navItems = new()
@@ -51,23 +87,69 @@ public partial class SettingsViewModel : ObservableObject
         NavigateFromLabel(value.Label);
     }
 
-    public SettingsViewModel(
-        IAuthService authService,
-        INavigationService navigationService)
+    public SettingsViewModel(IAuthService authService, INavigationService navigationService)
     {
         _authService = authService;
         _navigationService = navigationService;
 
         SelectedNavItem = NavItems.First(n => n.Label == "Settings");
+        LoadUserInfo();
+    }
 
-        if (_authService.CurrentUser != null)
+    private void LoadUserInfo()
+    {
+        if (_authService.CurrentUser == null) return;
+        var hour = DateTime.Now.Hour;
+        var greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+        WelcomeMessage = $"{greeting}, {_authService.CurrentUser.FullName}";
+        UserFullName = _authService.CurrentUser.FullName;
+        UserEmail = _authService.CurrentUser.Email ?? string.Empty;
+        UserName = _authService.CurrentUser.Username ?? string.Empty;
+        UserInitial = string.IsNullOrEmpty(UserFullName) ? "?" : UserFullName[0].ToString().ToUpper();
+    }
+
+    [RelayCommand]
+    private void EditProfile()
+    {
+        EditFullName = UserFullName;
+        EditEmail = UserEmail;
+        ProfileErrorMessage = string.Empty;
+        ProfileSuccessMessage = string.Empty;
+        IsEditingProfile = true;
+    }
+
+    [RelayCommand]
+    private async Task SaveProfileAsync()
+    {
+        if (_authService.CurrentUser == null) return;
+        if (string.IsNullOrWhiteSpace(EditFullName) || string.IsNullOrWhiteSpace(EditEmail))
         {
-            var hour = DateTime.Now.Hour;
-            var greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
-            WelcomeMessage = $"{greeting}, {_authService.CurrentUser.FullName}";
-            UserFullName = _authService.CurrentUser.FullName;
-            UserEmail = _authService.CurrentUser.Email ?? "N/A";
+            ProfileErrorMessage = "Name and email are required.";
+            return;
         }
+
+        var success = await _authService.UpdateProfileAsync(_authService.CurrentUser.Id, EditFullName.Trim(), EditEmail.Trim());
+        if (!success)
+        {
+            ProfileErrorMessage = "That email is already in use by another account.";
+            return;
+        }
+
+        UserFullName = EditFullName.Trim();
+        UserEmail = EditEmail.Trim();
+        UserInitial = string.IsNullOrEmpty(UserFullName) ? "?" : UserFullName[0].ToString().ToUpper();
+        WelcomeMessage = $"{(DateTime.Now.Hour < 12 ? "Good morning" : DateTime.Now.Hour < 17 ? "Good afternoon" : "Good evening")}, {UserFullName}";
+        ProfileSuccessMessage = "Profile updated successfully.";
+        ProfileErrorMessage = string.Empty;
+        IsEditingProfile = false;
+    }
+
+    [RelayCommand]
+    private void CancelEditProfile()
+    {
+        ProfileErrorMessage = string.Empty;
+        ProfileSuccessMessage = string.Empty;
+        IsEditingProfile = false;
     }
 
     private void NavigateFromLabel(string label)
@@ -86,6 +168,62 @@ public partial class SettingsViewModel : ObservableObject
 
         _selectedNavItem = NavItems[5];
         OnPropertyChanged(nameof(SelectedNavItem));
+    }
+
+    [RelayCommand]
+    private void ShowChangePassword()
+    {
+        CurrentPassword = string.Empty;
+        NewPassword = string.Empty;
+        ConfirmNewPassword = string.Empty;
+        PasswordErrorMessage = string.Empty;
+        PasswordSuccessMessage = string.Empty;
+        IsChangingPassword = true;
+    }
+
+    [RelayCommand]
+    private void CancelChangePassword()
+    {
+        PasswordErrorMessage = string.Empty;
+        PasswordSuccessMessage = string.Empty;
+        IsChangingPassword = false;
+    }
+
+    [RelayCommand]
+    private async Task SavePasswordAsync()
+    {
+        if (_authService.CurrentUser == null) return;
+
+        if (string.IsNullOrWhiteSpace(CurrentPassword) || string.IsNullOrWhiteSpace(NewPassword) || string.IsNullOrWhiteSpace(ConfirmNewPassword))
+        {
+            PasswordErrorMessage = "All fields are required.";
+            return;
+        }
+
+        if (NewPassword != ConfirmNewPassword)
+        {
+            PasswordErrorMessage = "New passwords do not match.";
+            return;
+        }
+
+        if (NewPassword.Length < 6)
+        {
+            PasswordErrorMessage = "Password must be at least 6 characters.";
+            return;
+        }
+
+        var success = await _authService.ChangePasswordAsync(_authService.CurrentUser.Id, CurrentPassword, NewPassword);
+        if (!success)
+        {
+            PasswordErrorMessage = "Current password is incorrect.";
+            return;
+        }
+
+        PasswordSuccessMessage = "Password changed successfully.";
+        PasswordErrorMessage = string.Empty;
+        CurrentPassword = string.Empty;
+        NewPassword = string.Empty;
+        ConfirmNewPassword = string.Empty;
     }
 
     [RelayCommand]

@@ -86,6 +86,12 @@ public partial class DashboardViewModel : ObservableObject
     private ObservableCollection<Medication> _allMedicines = new();
 
     [ObservableProperty]
+    private ObservableCollection<Medication> _lowStockMedications = new();
+
+    [ObservableProperty]
+    private bool _hasLowStockAlerts;
+
+    [ObservableProperty]
     private ObservableCollection<IntakeLog> _todayLogsTruncated = new();
 
     [ObservableProperty]
@@ -194,7 +200,7 @@ public partial class DashboardViewModel : ObservableObject
             TodayLogs = new ObservableCollection<IntakeLog>(logsList);
             TotalMedicines = allMedsList.Count;
             TakenToday = logsList.Count(l => l.Status == IntakeStatus.Taken);
-            MissedThisWeek = weekLogs.Count(l => l.Status == IntakeStatus.Dismissed);
+            MissedThisWeek = weekLogs.Count(l => l.Status == IntakeStatus.Missed);
 
             TodayLogsTruncated = new ObservableCollection<IntakeLog>(logsList.Take(3));
             HasMoreLogs = logsList.Count > 3;
@@ -202,9 +208,15 @@ public partial class DashboardViewModel : ObservableObject
 
             AllMedicines = new ObservableCollection<Medication>(allMedsList.Take(5));
 
+            var lowStock = allMedsList
+                .Where(m => m.RemainingPills.HasValue && m.LowStockAlertAt.HasValue && m.RemainingPills.Value <= m.LowStockAlertAt.Value && !m.IsArchived)
+                .ToList();
+            LowStockMedications = new ObservableCollection<Medication>(lowStock);
+            HasLowStockAlerts = lowStock.Count > 0;
+
             RecentActivityLogs = new ObservableCollection<IntakeLog>(
                 logsList
-                    .Where(l => l.Status == IntakeStatus.Taken || l.Status == IntakeStatus.Dismissed)
+                    .Where(l => l.Status == IntakeStatus.Taken || l.Status == IntakeStatus.Missed)
                     .OrderByDescending(l => l.ActionTimestamp ?? l.LoggedAt)
                     .Take(5));
         });
@@ -229,13 +241,13 @@ public partial class DashboardViewModel : ObservableObject
             }
         });
 
-        var upcoming = logs.Where(l => l.Status == IntakeStatus.Pending && l.ScheduledDateTime > DateTime.Now)
-                           .OrderBy(l => l.ScheduledDateTime)
+        var upcoming = logs.Where(l => l.Status == IntakeStatus.Pending && l.Reminder != null && l.Reminder.ScheduledDateTime > DateTime.Now)
+                           .OrderBy(l => l.Reminder!.ScheduledDateTime)
                            .FirstOrDefault();
         if (upcoming != null)
         {
-            NextDoseTime = upcoming.ScheduledDateTime.ToString("hh:mm tt");
-            NextDoseMedicine = upcoming.Medication?.DisplayName ?? upcoming.Medication?.OfficialName ?? "Unknown medication";
+            NextDoseTime = upcoming.Reminder!.ScheduledDateTime.ToString("hh:mm tt");
+            NextDoseMedicine = BuildMedicationName(upcoming.Medication);
         }
         else
         {
@@ -244,17 +256,27 @@ public partial class DashboardViewModel : ObservableObject
         }
     }
 
+    private static string BuildMedicationName(Medication? med)
+    {
+        if (med == null) return "Unknown medication";
+        if (!string.IsNullOrWhiteSpace(med.DisplayName) && !string.Equals(med.DisplayName, med.OfficialName, StringComparison.OrdinalIgnoreCase))
+            return $"{med.OfficialName} ({med.DisplayName})";
+        return med.OfficialName;
+    }
+
     [RelayCommand]
     private async Task MarkTakenAsync(IntakeLog log)
     {
-        await _intakeLogService.LogActionAsync(log.UserId, log.MedicationId, log.ScheduledDateTime, IntakeStatus.Taken);
+        if (log.Reminder == null) return;
+        await _intakeLogService.LogActionAsync(log.UserId, log.MedicationId, log.Reminder.ScheduledDateTime, IntakeStatus.Taken);
         await LoadDataAsync();
     }
 
     [RelayCommand]
-    private async Task MarkDismissedAsync(IntakeLog log)
+    private async Task MarkMissedAsync(IntakeLog log)
     {
-        await _intakeLogService.LogActionAsync(log.UserId, log.MedicationId, log.ScheduledDateTime, IntakeStatus.Dismissed);
+        if (log.Reminder == null) return;
+        await _intakeLogService.LogActionAsync(log.UserId, log.MedicationId, log.Reminder.ScheduledDateTime, IntakeStatus.Missed);
         await LoadDataAsync();
     }
 

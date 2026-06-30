@@ -106,7 +106,7 @@
 
                     <!-- Primary Action -->
                     <Button Command="{Binding LoginCommand}" Content="Sign In" Margin="0,8,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Background="#104C7F" Foreground="White" Padding="14" FontWeight="SemiBold" FontSize="14"
-                            Visibility="{Binding IsLoginMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            Visibility="{Binding IsLoginMode, Converter={StaticResource BooleanToVisibilityConverter}}" Click="Button_Click">
                         <Button.Style>
                             <Style TargetType="Button">
                                 <Setter Property="BorderThickness" Value="0" />

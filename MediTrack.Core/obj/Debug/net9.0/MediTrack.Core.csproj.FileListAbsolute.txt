@@ -11,3 +11,6 @@ D:\Assignments\MediTrack\MediTrack.Core\obj\Debug\net9.0\refint\MediTrack.Core.d
 D:\Assignments\MediTrack\MediTrack.Core\obj\Debug\net9.0\MediTrack.Core.pdb
 D:\Assignments\MediTrack\MediTrack.Core\obj\Debug\net9.0\ref\MediTrack.Core.dll
 D:\Assignments\MediTrack\MediTrack.Core\obj\Debug\net9.0\MediTrack.Core.sourcelink.json
+D:\Assignments\MediTrack\MediTrack.Core\obj\TestBuild\MediTrack.Core.deps.json
+D:\Assignments\MediTrack\MediTrack.Core\obj\TestBuild\MediTrack.Core.dll
+D:\Assignments\MediTrack\MediTrack.Core\obj\TestBuild\MediTrack.Core.pdb

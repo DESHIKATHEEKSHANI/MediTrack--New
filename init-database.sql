@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS Medications (
     IsArchived TINYINT(1) NOT NULL DEFAULT 0,
     RemainingPills INT NULL,
     LowStockAlertAt INT NULL,
+    SnoozeMinutes INT NULL,
     CONSTRAINT FK_Medications_Users FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

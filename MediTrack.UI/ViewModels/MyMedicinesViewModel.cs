@@ -7,6 +7,7 @@ using MediTrack.UI.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace MediTrack.UI.ViewModels;
 
@@ -39,6 +40,9 @@ public partial class MyMedicinesViewModel : ObservableObject
 
     [ObservableProperty]
     private string _welcomeMessage = string.Empty;
+
+    [ObservableProperty]
+    private Dictionary<string, string> _validationErrors = new();
 
     [ObservableProperty]
     private ObservableCollection<NavItem> _navItems = new()
@@ -121,6 +125,12 @@ public partial class MyMedicinesViewModel : ObservableObject
             WelcomeMessage = $"{greeting}, {_authService.CurrentUser.FullName}";
         }
 
+        _navigationService.Navigated += (_, _) =>
+        {
+            if (_navigationService.CurrentViewModel == this)
+                _ = LoadMedicinesAsync();
+        };
+
         _ = LoadMedicinesAsync();
     }
 
@@ -180,15 +190,10 @@ public partial class MyMedicinesViewModel : ObservableObject
         {
             UserId = _authService.CurrentUser?.Id ?? 0,
             MedicineType = "Tablet",
-            Frequency = "Once daily",
-            MealTiming = "Any Time",
             DosageUnit = "tablet",
-            IsOngoing = true,
             IsArchived = false,
-            WeekdaySchedule = Enum.GetValues<DayOfWeek>(),
-            ReminderTimes = "08:00",
-            StartDate = DateTime.Now,
         };
+        ValidationErrors = new Dictionary<string, string>();
         IsEditing = false;
         IsPopupOpen = true;
     }
@@ -218,6 +223,7 @@ public partial class MyMedicinesViewModel : ObservableObject
             WeekdaySchedule = medication.WeekdaySchedule,
             ScheduledTime = medication.ScheduledTime,
         };
+        ValidationErrors = new Dictionary<string, string>();
         IsEditing = true;
         IsPopupOpen = true;
     }
@@ -228,20 +234,35 @@ public partial class MyMedicinesViewModel : ObservableObject
         IsPopupOpen = false;
     }
 
+    private bool ValidateMedicine()
+    {
+        var errors = new Dictionary<string, string>();
+
+        if (string.IsNullOrWhiteSpace(SelectedMedicine.OfficialName))
+        {
+            errors["OfficialName"] = "Medicine name is required.";
+        }
+        else if (!IsEditing && Medicines.Any(m =>
+            m.OfficialName.Trim().Equals(SelectedMedicine.OfficialName.Trim(), StringComparison.OrdinalIgnoreCase) &&
+            !m.IsArchived))
+        {
+            errors["OfficialName"] = "A medicine with this name already exists.";
+        }
+
+        if (SelectedMedicine.DosageValue <= 0)
+            errors["DosageValue"] = "Dose amount must be greater than 0.";
+
+        ValidationErrors = errors;
+        return errors.Count == 0;
+    }
+
     [RelayCommand]
     private async Task SaveMedicineAsync()
     {
         if (_authService.CurrentUser == null) return;
+        if (!ValidateMedicine()) return;
 
         SelectedMedicine.UserId = _authService.CurrentUser.Id;
-
-        // Derive ScheduledTime from first reminder time
-        if (!string.IsNullOrWhiteSpace(SelectedMedicine.ReminderTimes))
-        {
-            var firstTime = SelectedMedicine.ReminderTimes.Split(',').FirstOrDefault();
-            if (TimeSpan.TryParse(firstTime, out var ts))
-                SelectedMedicine.ScheduledTime = ts;
-        }
 
         if (IsEditing)
             await _medicationService.UpdateAsync(SelectedMedicine);

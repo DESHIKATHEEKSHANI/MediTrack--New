@@ -65,7 +65,7 @@
                     <DataTemplate DataType="{x:Type models:NavItem}">
                         <Border Style="{StaticResource NavItemStyle}">
                             <StackPanel Orientation="Horizontal">
-                                <Ellipse Width="8" Height="8" Fill="White" Margin="0,0,12,0" VerticalAlignment="Center" />
+                                <Path Data="{Binding Icon}" Fill="White" Width="16" Height="16" Stretch="Uniform" Margin="0,0,12,0" VerticalAlignment="Center" />
                                 <TextBlock Text="{Binding Label}" Foreground="White" FontSize="14" VerticalAlignment="Center" />
                             </StackPanel>
                         </Border>
@@ -123,24 +123,73 @@
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="24">
                 <StackPanel>
                     <!-- Global Notifications Toggle -->
-                    <Border Background="White" CornerRadius="12" Padding="20" Margin="0,0,0,20">
+                    <Border CornerRadius="12" Padding="20" Margin="0,0,0,20">
                         <Border.Effect><DropShadowEffect ShadowDepth="0" BlurRadius="12" Opacity="0.06" Color="#000000" /></Border.Effect>
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#E8F5E9" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding NotificationsEnabled}" Value="False">
+                                        <Setter Property="Background" Value="#FFF8E1" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
                         <Grid>
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                <TextBlock Text="Notifications" FontSize="16" FontWeight="SemiBold" Foreground="#1A1A1A" />
-                                <TextBlock Text="Enable or disable all reminder notifications" FontSize="12" Foreground="#888888" Margin="0,2,0,0" />
+                            <Border Grid.Column="0" Width="44" Height="44" CornerRadius="22" Margin="0,0,14,0" VerticalAlignment="Center">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="#4CAF50" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding NotificationsEnabled}" Value="False">
+                                                <Setter Property="Background" Value="#FF9800" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <Path Data="M18 16v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-5 0h-2v-2h2v2zm0-4h-2V9h2v3z"
+                                      Fill="White" Width="22" Height="22" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock FontSize="15" FontWeight="SemiBold">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="Notifications Active" />
+                                            <Setter Property="Foreground" Value="#2E7D32" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding NotificationsEnabled}" Value="False">
+                                                    <Setter Property="Text" Value="Notifications Paused" />
+                                                    <Setter Property="Foreground" Value="#E65100" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <TextBlock FontSize="12" Foreground="#888888" Margin="0,2,0,0">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="Reminders will fire at their scheduled times" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding NotificationsEnabled}" Value="False">
+                                                    <Setter Property="Text" Value="Toggle on to receive medication reminders" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
                             </StackPanel>
-                            <ToggleButton Grid.Column="1" IsChecked="{Binding NotificationsEnabled}" VerticalAlignment="Center">
+                            <ToggleButton Grid.Column="2" IsChecked="{Binding NotificationsEnabled}" VerticalAlignment="Center">
                                 <ToggleButton.Style>
                                     <Style TargetType="ToggleButton">
                                         <Setter Property="Template">
                                             <Setter.Value>
                                                 <ControlTemplate TargetType="ToggleButton">
-                                                    <Border Width="48" Height="26" CornerRadius="13" Background="#E0E0E0">
+                                                    <Border Width="48" Height="26" CornerRadius="13">
                                                         <Border.Style>
                                                             <Style TargetType="Border">
                                                                 <Setter Property="Background" Value="#E0E0E0" />
@@ -151,7 +200,7 @@
                                                                 </Style.Triggers>
                                                             </Style>
                                                         </Border.Style>
-                                                        <Ellipse Width="20" Height="20" Fill="White" HorizontalAlignment="Left" Margin="3,0,0,0">
+                                                        <Ellipse Width="20" Height="20" Fill="White" Margin="3,0">
                                                             <Ellipse.Style>
                                                                 <Style TargetType="Ellipse">
                                                                     <Setter Property="HorizontalAlignment" Value="Left" />
@@ -181,12 +230,20 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="Reminder Rules" FontSize="16" FontWeight="SemiBold" Foreground="#1A1A1A" />
-                                <TextBlock Grid.Column="1" Text="{Binding Reminders.Count, StringFormat='{}{0} rules'}" FontSize="12" Foreground="#888888" VerticalAlignment="Center" />
+                                <TextBox Grid.Column="1" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Width="200" Padding="8,4" Background="#F8F9FA" BorderBrush="#E0E0E0" Margin="0,0,12,0" FontSize="12">
+                                    <TextBox.Style>
+                                        <Style TargetType="TextBox">
+                                            <Setter Property="ToolTip" Value="Search by medicine name, time, or frequency" />
+                                        </Style>
+                                    </TextBox.Style>
+                                </TextBox>
+                                <TextBlock Grid.Column="2" Text="{Binding FilteredReminders.Count, StringFormat='{}{0} rules'}" FontSize="12" Foreground="#888888" VerticalAlignment="Center" />
                             </Grid>
 
-                            <ItemsControl ItemsSource="{Binding Reminders}">
+                            <ItemsControl ItemsSource="{Binding FilteredReminders}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type models:ReminderSetting}">
                                         <Border Background="#F8F9FA" CornerRadius="8" Padding="16" Margin="0,0,0,10">
@@ -205,7 +262,7 @@
                                                             <Setter Property="Template">
                                                                 <Setter.Value>
                                                                     <ControlTemplate TargetType="ToggleButton">
-                                                                        <Border Width="40" Height="22" CornerRadius="11" Background="#E0E0E0">
+                                                                        <Border Width="40" Height="22" CornerRadius="11">
                                                                             <Border.Style>
                                                                                 <Style TargetType="Border">
                                                                                     <Setter Property="Background" Value="#E0E0E0" />
@@ -216,7 +273,7 @@
                                                                                     </Style.Triggers>
                                                                                 </Style>
                                                                             </Border.Style>
-                                                                            <Ellipse Width="16" Height="16" Fill="White" HorizontalAlignment="Left" Margin="3,0,0,0">
+                                                                            <Ellipse Width="16" Height="16" Fill="White" Margin="3,0">
                                                                                 <Ellipse.Style>
                                                                                     <Style TargetType="Ellipse">
                                                                                         <Setter Property="HorizontalAlignment" Value="Left" />
@@ -239,13 +296,20 @@
                                                 <!-- Reminder Info -->
                                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                                     <TextBlock Text="{Binding MedicationName}" FontSize="15" FontWeight="SemiBold" Foreground="#1A1A1A" />
-                                                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-                                                        <Border Background="#E3F2FD" CornerRadius="4" Padding="6,2" Margin="0,0,6,0">
+                                                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0" FlowDirection="LeftToRight">
+                                                        <!-- Time -->
+                                                        <Border Background="#E3F2FD" CornerRadius="4" Padding="6,2" Margin="0,0,5,0">
                                                             <TextBlock Text="{Binding Time}" FontSize="11" Foreground="#104C7F" FontWeight="SemiBold" />
                                                         </Border>
-                                                        <Border Background="#FFF3E0" CornerRadius="4" Padding="6,2" Margin="0,0,6,0">
+                                                        <!-- Active days from WeekdaySchedule -->
+                                                        <Border Background="#E8F5E9" CornerRadius="4" Padding="6,2" Margin="0,0,5,0">
+                                                            <TextBlock Text="{Binding ActiveDays}" FontSize="11" Foreground="#2E7D32" FontWeight="SemiBold" />
+                                                        </Border>
+                                                        <!-- Frequency (how many times per day) -->
+                                                        <Border Background="#FFF3E0" CornerRadius="4" Padding="6,2" Margin="0,0,5,0">
                                                             <TextBlock Text="{Binding Frequency}" FontSize="11" Foreground="#E65100" FontWeight="SemiBold" />
                                                         </Border>
+                                                        <!-- Snooze -->
                                                         <Border Background="#F3E5F5" CornerRadius="4" Padding="6,2">
                                                             <TextBlock Text="{Binding SnoozeMinutes, StringFormat='Snooze {0}min'}" FontSize="11" Foreground="#7B1FA2" FontWeight="SemiBold" />
                                                         </Border>
@@ -282,7 +346,7 @@
 
             <!-- Add/Edit Reminder Overlay -->
             <Grid Grid.RowSpan="2" Background="#AA000000" Visibility="{Binding IsPopupOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <Border Background="White" CornerRadius="16" Width="480" Padding="28" HorizontalAlignment="Center" VerticalAlignment="Center" MaxHeight="600">
+                <Border Background="White" CornerRadius="16" Width="520" Padding="28" HorizontalAlignment="Center" VerticalAlignment="Center" MaxHeight="700">
                     <Border.Effect><DropShadowEffect ShadowDepth="0" BlurRadius="24" Opacity="0.4" Color="#000000" /></Border.Effect>
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel>
@@ -299,28 +363,111 @@
                                 </TextBlock.Style>
                             </TextBlock>
 
-                            <TextBlock Text="Medicine" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
-                            <ComboBox ItemsSource="{Binding Medications}" SelectedValue="{Binding SelectedReminder.MedicationId}" SelectedValuePath="Id" DisplayMemberPath="OfficialName" Padding="8,6" Background="#F8F9FA" BorderBrush="#E0E0E0" Margin="0,0,0,12" />
+                            <TextBlock Text="Medicine *" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
+                            <ComboBox ItemsSource="{Binding Medications}" SelectedValue="{Binding SelectedMedicationId}" SelectedValuePath="Id" DisplayMemberPath="OfficialName" Padding="8,6" Background="#F8F9FA" BorderBrush="#E0E0E0" Margin="0,0,0,4" />
+                            <TextBlock Text="{Binding ValidationErrors[Medication]}" FontSize="11" Foreground="#D32F2F" Margin="0,0,0,12" Visibility="{Binding ValidationErrors[Medication], Converter={StaticResource StringToVisibilityConverter}}" />
 
-                            <Grid Margin="0,0,0,12">
+                            <TextBlock Text="Reminder Times *" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
+                            <ItemsControl ItemsSource="{Binding ReminderTimes}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type models:ReminderTimeEntry}">
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <ComboBox Grid.Column="0" ItemsSource="{Binding DataContext.Hours, RelativeSource={RelativeSource AncestorType=UserControl}}" SelectedItem="{Binding Hour}" Padding="8,6" Background="#F8F9FA" BorderBrush="#E0E0E0" Width="70" Margin="0,0,6,0" />
+                                            <TextBlock Grid.Column="1" Text=":" FontSize="16" Foreground="#555555" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                            <ComboBox Grid.Column="2" ItemsSource="{Binding DataContext.Minutes, RelativeSource={RelativeSource AncestorType=UserControl}}" SelectedItem="{Binding Minute}" Padding="8,6" Background="#F8F9FA" BorderBrush="#E0E0E0" Width="70" Margin="0,0,6,0" />
+                                            <ComboBox Grid.Column="3" ItemsSource="{Binding DataContext.AmPmOptions, RelativeSource={RelativeSource AncestorType=UserControl}}" SelectedItem="{Binding AmPm}" Padding="8,6" Background="#F8F9FA" BorderBrush="#E0E0E0" Width="70" Margin="0,0,6,0" />
+                                            <Button Grid.Column="4" Content="&#x2715;" Command="{Binding DataContext.RemoveTimeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="Transparent" Foreground="#D32F2F" FontSize="14" Padding="6" BorderThickness="0" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <Button Content="+ Add Time" Command="{Binding AddTimeCommand}" Background="Transparent" Foreground="#104C7F" FontWeight="SemiBold" Padding="0,6" HorizontalAlignment="Left" BorderThickness="0" Margin="0,0,0,12" />
+                            <TextBlock Text="{Binding ValidationErrors[Times]}" FontSize="11" Foreground="#D32F2F" Margin="0,0,0,12" Visibility="{Binding ValidationErrors[Times], Converter={StaticResource StringToVisibilityConverter}}" />
+
+                            <TextBlock Text="Snooze Duration (minutes)" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
+                            <ComboBox ItemsSource="{Binding SnoozeOptions}" SelectedItem="{Binding SelectedSnoozeMinutes}" Padding="8,6" Background="#F8F9FA" BorderBrush="#E0E0E0" Margin="0,0,0,16" />
+
+                            <!-- Active Days -->
+                            <TextBlock Text="Active Days *" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,8" />
+                            <ItemsControl ItemsSource="{Binding Weekdays}" Margin="0,0,0,4">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type models:DayOfWeekCheckItem}">
+                                        <ToggleButton IsChecked="{Binding IsSelected}" Margin="0,0,6,6" BorderThickness="0">
+                                            <ToggleButton.Template>
+                                                <ControlTemplate TargetType="ToggleButton">
+                                                    <Border CornerRadius="6" Padding="12,7" Cursor="Hand">
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="Background" Value="#F0F0F0" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True">
+                                                                        <Setter Property="Background" Value="#104C7F" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+                                                        <TextBlock Text="{Binding ShortLabel}" FontSize="12" FontWeight="SemiBold">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Setter Property="Foreground" Value="#555555" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True">
+                                                                            <Setter Property="Foreground" Value="White" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </ToggleButton.Template>
+                                        </ToggleButton>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock Text="{Binding ValidationErrors[Weekdays]}" FontSize="11" Foreground="#D32F2F" Margin="0,0,0,12" Visibility="{Binding ValidationErrors[Weekdays], Converter={StaticResource StringToVisibilityConverter}}" />
+
+                            <!-- Schedule Dates -->
+                            <Grid Margin="0,0,0,8">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" Margin="0,0,8,0">
-                                    <TextBlock Text="Reminder Time (HH:MM)" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
-                                    <TextBox Text="{Binding SelectedReminder.Time}" Padding="10,8" Background="#F8F9FA" BorderBrush="#E0E0E0" />
+                                    <TextBlock Text="Start Date" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
+                                    <DatePicker SelectedDate="{Binding SelectedStartDate}" Padding="8,6" Background="#F8F9FA" BorderBrush="#E0E0E0" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" Margin="8,0,0,0">
-                                    <TextBlock Text="Frequency" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
-                                    <ComboBox ItemsSource="{Binding Frequencies}" SelectedItem="{Binding SelectedReminder.Frequency}" Padding="8,6" Background="#F8F9FA" BorderBrush="#E0E0E0" />
+                                    <TextBlock Text="End Date" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
+                                    <DatePicker SelectedDate="{Binding SelectedEndDate}" Padding="8,6" Background="#F8F9FA" BorderBrush="#E0E0E0">
+                                        <DatePicker.Style>
+                                            <Style TargetType="DatePicker">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsOngoingReminder}" Value="True">
+                                                        <Setter Property="IsEnabled" Value="False" />
+                                                        <Setter Property="Opacity" Value="0.45" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </DatePicker.Style>
+                                    </DatePicker>
                                 </StackPanel>
                             </Grid>
+                            <CheckBox Content="Ongoing medication — no end date" IsChecked="{Binding IsOngoingReminder}" Foreground="#555555" Margin="0,0,0,16" />
 
-                            <TextBlock Text="Snooze Duration (minutes)" FontSize="12" Foreground="#555555" FontWeight="Medium" Margin="0,0,0,4" />
-                            <ComboBox ItemsSource="{Binding SnoozeOptions}" SelectedItem="{Binding SelectedReminder.SnoozeMinutes}" Padding="8,6" Background="#F8F9FA" BorderBrush="#E0E0E0" Margin="0,0,0,12" />
-
-                            <CheckBox Content="Enabled" IsChecked="{Binding SelectedReminder.IsEnabled}" Foreground="#555555" Margin="0,0,0,20" />
+                            <CheckBox Content="Enabled" IsChecked="{Binding IsReminderEnabled}" Foreground="#555555" Margin="0,0,0,20" />
 
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                 <Button Content="Cancel" Command="{Binding ClosePopupCommand}" Background="Transparent" Foreground="#666666" Padding="12,8" Margin="0,0,8,0" BorderThickness="0" />

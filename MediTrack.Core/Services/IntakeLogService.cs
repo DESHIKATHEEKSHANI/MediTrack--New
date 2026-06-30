@@ -8,6 +8,8 @@ public class IntakeLogService : IIntakeLogService
 {
     private readonly MediTrackDbContext _context;
 
+    public event EventHandler<Medication>? LowStockAlertTriggered;
+
     public IntakeLogService(MediTrackDbContext context)
     {
         _context = context;
@@ -15,38 +17,111 @@ public class IntakeLogService : IIntakeLogService
 
     public async Task<IntakeLog> LogActionAsync(int userId, int medicationId, DateTime scheduledDateTime, IntakeStatus status)
     {
+        // Try to find an existing reminder for this dose
+        var reminder = await _context.Reminders
+            .FirstOrDefaultAsync(r => r.MedicationId == medicationId && r.ScheduledDateTime == scheduledDateTime);
+
+        if (reminder == null)
+        {
+            // No pre-generated reminder found — look up the matching schedule so the FK is valid
+            var timeOfDay = scheduledDateTime.TimeOfDay;
+            var scheduleId = await _context.MedicationSchedules
+                .Where(s => s.MedicationId == medicationId && s.IsActive && s.ReminderTime == timeOfDay)
+                .Select(s => s.Id)
+                .FirstOrDefaultAsync();
+
+            // Fallback: any active schedule for this medication
+            if (scheduleId == 0)
+                scheduleId = await _context.MedicationSchedules
+                    .Where(s => s.MedicationId == medicationId && s.IsActive)
+                    .Select(s => s.Id)
+                    .FirstOrDefaultAsync();
+
+            if (scheduleId == 0)
+            {
+                // No valid schedule exists — create a placeholder IntakeLog without a Reminder row
+                var fallback = new IntakeLog
+                {
+                    ReminderId = 0,
+                    UserId = userId,
+                    MedicationId = medicationId,
+                    ActionTimestamp = DateTime.UtcNow,
+                    Status = status
+                };
+                return fallback;
+            }
+
+            reminder = new Reminder
+            {
+                MedicationId = medicationId,
+                ScheduleId = scheduleId,
+                ScheduledDateTime = scheduledDateTime,
+                Status = status == IntakeStatus.Taken ? ReminderStatus.Taken : ReminderStatus.Missed
+            };
+            _context.Reminders.Add(reminder);
+            await _context.SaveChangesAsync();
+        }
+        else
+        {
+            reminder.Status = status == IntakeStatus.Taken ? ReminderStatus.Taken : ReminderStatus.Missed;
+        }
+
         var existing = await _context.IntakeLogs
-            .FirstOrDefaultAsync(l => l.UserId == userId && l.MedicationId == medicationId && l.ScheduledDateTime == scheduledDateTime);
+            .FirstOrDefaultAsync(l => l.ReminderId == reminder.Id);
         if (existing != null)
         {
             existing.Status = status;
             existing.ActionTimestamp = DateTime.UtcNow;
             await _context.SaveChangesAsync();
+            await DecrementPillsAndCheckLowStockAsync(medicationId, status);
             return existing;
         }
 
         var log = new IntakeLog
         {
+            ReminderId = reminder.Id,
             UserId = userId,
             MedicationId = medicationId,
-            ScheduledDateTime = scheduledDateTime,
             ActionTimestamp = DateTime.UtcNow,
             Status = status
         };
         _context.IntakeLogs.Add(log);
         await _context.SaveChangesAsync();
+        await DecrementPillsAndCheckLowStockAsync(medicationId, status);
         return log;
+    }
+
+    private async Task DecrementPillsAndCheckLowStockAsync(int medicationId, IntakeStatus status)
+    {
+        if (status != IntakeStatus.Taken) return;
+
+        var med = await _context.Medications
+            .Include(m => m.Inventory)
+            .FirstOrDefaultAsync(m => m.Id == medicationId);
+        if (med == null || med.Inventory == null || !med.Inventory.RemainingPills.HasValue) return;
+
+        med.Inventory.RemainingPills = Math.Max(0, med.Inventory.RemainingPills.Value - 1);
+        await _context.SaveChangesAsync();
+
+        if (med.Inventory.LowStockAlertAt.HasValue && med.Inventory.RemainingPills.Value <= med.Inventory.LowStockAlertAt.Value)
+        {
+            LowStockAlertTriggered?.Invoke(this, med);
+        }
     }
 
     public async Task<IEnumerable<IntakeLog>> GetUserLogsAsync(int userId, DateTime? from = null, DateTime? to = null)
     {
-        var query = _context.IntakeLogs.AsNoTracking().Include(l => l.Medication).Where(l => l.UserId == userId);
+        var query = _context.IntakeLogs
+            .AsNoTracking()
+            .Include(l => l.Medication)
+            .Include(l => l.Reminder)
+            .Where(l => l.UserId == userId);
         if (from.HasValue)
-            query = query.Where(l => l.ScheduledDateTime >= from.Value);
+            query = query.Where(l => l.Reminder != null && l.Reminder.ScheduledDateTime >= from.Value);
         if (to.HasValue)
-            query = query.Where(l => l.ScheduledDateTime <= to.Value);
+            query = query.Where(l => l.Reminder != null && l.Reminder.ScheduledDateTime <= to.Value);
 
-        return await query.OrderByDescending(l => l.ScheduledDateTime).ToListAsync();
+        return await query.OrderByDescending(l => l.Reminder!.ScheduledDateTime).ToListAsync();
     }
 
     public async Task<IEnumerable<IntakeLog>> GetTodayLogsAsync(int userId)
@@ -56,8 +131,9 @@ public class IntakeLogService : IIntakeLogService
         return await _context.IntakeLogs
             .AsNoTracking()
             .Include(l => l.Medication)
-            .Where(l => l.UserId == userId && l.ScheduledDateTime >= today && l.ScheduledDateTime < tomorrow)
-            .OrderBy(l => l.ScheduledDateTime)
+            .Include(l => l.Reminder)
+            .Where(l => l.UserId == userId && l.Reminder != null && l.Reminder.ScheduledDateTime >= today && l.Reminder.ScheduledDateTime < tomorrow)
+            .OrderBy(l => l.Reminder!.ScheduledDateTime)
             .ToListAsync();
     }
 
@@ -66,7 +142,8 @@ public class IntakeLogService : IIntakeLogService
         var weekAgo = DateTime.Now.AddDays(-7);
         var logs = await _context.IntakeLogs
             .AsNoTracking()
-            .Where(l => l.UserId == userId && l.ScheduledDateTime >= weekAgo)
+            .Include(l => l.Reminder)
+            .Where(l => l.UserId == userId && l.Reminder != null && l.Reminder.ScheduledDateTime >= weekAgo)
             .ToListAsync();
 
         if (logs.Count == 0) return 0;
@@ -86,7 +163,8 @@ public class IntakeLogService : IIntakeLogService
             var nextDay = day.AddDays(1);
             var logs = await _context.IntakeLogs
                 .AsNoTracking()
-                .Where(l => l.UserId == userId && l.ScheduledDateTime >= day && l.ScheduledDateTime < nextDay)
+                .Include(l => l.Reminder)
+                .Where(l => l.UserId == userId && l.Reminder != null && l.Reminder.ScheduledDateTime >= day && l.Reminder.ScheduledDateTime < nextDay)
                 .ToListAsync();
 
             if (logs.Count == 0)
@@ -106,6 +184,7 @@ public class IntakeLogService : IIntakeLogService
     public async Task GenerateScheduledLogsAsync(int userId)
     {
         var medications = await _context.Medications
+            .Include(m => m.Schedules)
             .Where(m => m.UserId == userId && m.IsActive)
             .ToListAsync();
 
@@ -114,23 +193,40 @@ public class IntakeLogService : IIntakeLogService
 
         foreach (var med in medications)
         {
-            if (!med.WeekdaySchedule.Contains(today.DayOfWeek))
-                continue;
-
-            var scheduled = todayStart.Add(med.ScheduledTime);
-            var exists = await _context.IntakeLogs.AnyAsync(l =>
-                l.MedicationId == med.Id &&
-                l.ScheduledDateTime == scheduled);
-
-            if (!exists)
+            foreach (var schedule in med.Schedules.Where(s => s.IsActive && s.WeekdaySchedule.Contains(today.DayOfWeek)))
             {
-                _context.IntakeLogs.Add(new IntakeLog
+                var scheduled = todayStart.Add(schedule.ReminderTime);
+
+                if (schedule.EndDate.HasValue && scheduled > schedule.EndDate.Value) continue;
+                if (schedule.StartDate.HasValue && scheduled < schedule.StartDate.Value) continue;
+
+                var reminder = await _context.Reminders
+                    .FirstOrDefaultAsync(r => r.MedicationId == med.Id && r.ScheduleId == schedule.Id && r.ScheduledDateTime == scheduled);
+
+                if (reminder == null)
                 {
-                    UserId = userId,
-                    MedicationId = med.Id,
-                    ScheduledDateTime = scheduled,
-                    Status = IntakeStatus.Pending
-                });
+                    reminder = new Reminder
+                    {
+                        MedicationId = med.Id,
+                        ScheduleId = schedule.Id,
+                        ScheduledDateTime = scheduled,
+                        Status = ReminderStatus.Pending
+                    };
+                    _context.Reminders.Add(reminder);
+                    await _context.SaveChangesAsync();
+                }
+
+                var exists = await _context.IntakeLogs.AnyAsync(l => l.ReminderId == reminder.Id);
+                if (!exists)
+                {
+                    _context.IntakeLogs.Add(new IntakeLog
+                    {
+                        ReminderId = reminder.Id,
+                        UserId = userId,
+                        MedicationId = med.Id,
+                        Status = IntakeStatus.Pending
+                    });
+                }
             }
         }
 

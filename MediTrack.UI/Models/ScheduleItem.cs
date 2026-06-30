@@ -14,7 +14,7 @@ public class ScheduleItem
     public string Instructions { get; set; } = string.Empty;
     public IntakeStatus Status { get; set; }
     public bool IsTaken => Status == IntakeStatus.Taken;
-    public bool IsPending => Status == IntakeStatus.Pending;
-    public bool IsDismissed => Status == IntakeStatus.Dismissed;
+    public bool IsPending => Status == IntakeStatus.Pending && !IsMissed;
+    public bool IsMissed => Status == IntakeStatus.Missed;
     public string StatusText => Status.ToString();
 }

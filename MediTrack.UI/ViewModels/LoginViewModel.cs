@@ -74,6 +74,12 @@ public partial class LoginViewModel : ObservableObject
             return;
         }
 
+        if (!IsValidEmail(Email))
+        {
+            ErrorMessage = "Please enter a valid email address (e.g. user@example.com).";
+            return;
+        }
+
         if (Password != ConfirmPassword)
         {
             ErrorMessage = "Passwords do not match.";
@@ -96,6 +102,14 @@ public partial class LoginViewModel : ObservableObject
         {
             ErrorMessage = "Username or email already exists.";
         }
+    }
+
+    private static bool IsValidEmail(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email)) return false;
+        return System.Text.RegularExpressions.Regex.IsMatch(email.Trim(),
+            @"^[^@\s]+@[^@\s]+\.[^@\s]{2,}$",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
     }
 
     [RelayCommand]

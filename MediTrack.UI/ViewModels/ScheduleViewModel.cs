@@ -114,6 +114,12 @@ public partial class ScheduleViewModel : ObservableObject
             WelcomeMessage = $"{greeting}, {_authService.CurrentUser.FullName}";
         }
 
+        _navigationService.Navigated += (_, _) =>
+        {
+            if (_navigationService.CurrentViewModel == this)
+                _ = LoadScheduleAsync();
+        };
+
         _ = LoadScheduleAsync();
     }
 
@@ -126,7 +132,7 @@ public partial class ScheduleViewModel : ObservableObject
         var dayOfWeek = date.DayOfWeek;
 
         var medications = await _medicationService.GetUserMedicationsAsync(userId);
-        var scheduledMeds = medications.Where(m => m.WeekdaySchedule.Contains(dayOfWeek) && !m.IsArchived).ToList();
+        var scheduledMeds = medications.Where(m => m.Schedules.Any(s => s.WeekdaySchedule.Contains(dayOfWeek) && s.IsActive) && !m.IsArchived).ToList();
 
         var from = date;
         var to = date.AddDays(1);
@@ -135,23 +141,39 @@ public partial class ScheduleViewModel : ObservableObject
         var items = new List<ScheduleItem>();
         foreach (var med in scheduledMeds)
         {
-            var scheduledDateTime = date.Add(med.ScheduledTime);
-            var log = logs
-                .Where(l => l.MedicationId == med.Id && l.ScheduledDateTime == scheduledDateTime)
-                .OrderByDescending(l => l.Id)
-                .FirstOrDefault();
-
-            items.Add(new ScheduleItem
+            foreach (var schedule in med.Schedules.Where(s => s.WeekdaySchedule.Contains(dayOfWeek) && s.IsActive).OrderBy(s => s.ReminderTime))
             {
-                MedicationId = med.Id,
-                MedicationName = med.OfficialName,
-                DisplayName = med.DisplayName ?? med.OfficialName,
-                ScheduledTime = med.ScheduledTime,
-                Date = date,
-                Dosage = $"{med.DosageValue} {med.DosageUnit}",
-                Instructions = med.IntakeInstructions,
-                Status = log?.Status ?? IntakeStatus.Pending
-            });
+                var scheduledDateTime = date.Add(schedule.ReminderTime);
+                var log = logs
+                    .Where(l => l.MedicationId == med.Id && l.Reminder != null && l.Reminder.ScheduledDateTime == scheduledDateTime)
+                    .OrderByDescending(l => l.Id)
+                    .FirstOrDefault();
+
+                var status = log?.Status ?? IntakeStatus.Pending;
+                // Auto-mark past-due pending as Missed
+                if (status == IntakeStatus.Pending && scheduledDateTime < DateTime.Now)
+                {
+                    status = IntakeStatus.Missed;
+                    if (log != null && _authService.CurrentUser != null)
+                    {
+                        await _intakeLogService.LogActionAsync(
+                            _authService.CurrentUser.Id, med.Id, scheduledDateTime, IntakeStatus.Missed);
+                    }
+                }
+
+                var fullName = BuildMedicationName(med);
+                items.Add(new ScheduleItem
+                {
+                    MedicationId = med.Id,
+                    MedicationName = fullName,
+                    DisplayName = med.DisplayName ?? string.Empty,
+                    ScheduledTime = schedule.ReminderTime,
+                    Date = date,
+                    Dosage = $"{med.DosageValue} {med.DosageUnit}",
+                    Instructions = med.IntakeInstructions,
+                    Status = status
+                });
+            }
         }
 
         var sortedItems = items.OrderBy(i => i.ScheduledTime).ToList();
@@ -183,14 +205,14 @@ public partial class ScheduleViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task MarkSkippedAsync(ScheduleItem item)
+    private async Task MarkMissedAsync(ScheduleItem item)
     {
         if (_authService.CurrentUser == null) return;
         await _intakeLogService.LogActionAsync(
             _authService.CurrentUser.Id,
             item.MedicationId,
             item.ScheduledDateTime,
-            IntakeStatus.Dismissed);
+            IntakeStatus.Missed);
         await LoadScheduleAsync();
     }
 
@@ -219,4 +241,12 @@ public partial class ScheduleViewModel : ObservableObject
         var loginVm = App.Services.GetRequiredService<LoginViewModel>();
         _navigationService.NavigateTo(loginVm);
     }
+
+    private static string BuildMedicationName(MediTrack.Core.Models.Medication med)
+    {
+        if (!string.IsNullOrWhiteSpace(med.DisplayName) && !string.Equals(med.DisplayName, med.OfficialName, StringComparison.OrdinalIgnoreCase))
+            return $"{med.OfficialName} ({med.DisplayName})";
+        return med.OfficialName;
+    }
+
 }
